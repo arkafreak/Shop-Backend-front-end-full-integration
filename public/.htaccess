@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteBase /shop4/public
+
+    # Basic rewrite rule to test
+    RewriteRule ^test$ index.php?url=test [QSA,L]
+
+    # Uncomment the following lines gradually to identify issues
+     RewriteCond %{REQUEST_URI} ^/shop4/public/products [OR]
+     RewriteCond %{REQUEST_URI} ^/shop4/public/categories
+     RewriteCond %{HTTP_COOKIE} !PHPSESSID=
+     RewriteRule ^(.*)$ /shop4/public/login [L,R=302]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>

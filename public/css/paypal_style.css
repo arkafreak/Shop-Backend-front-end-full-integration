@@ -1,0 +1,80 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Professional sans-serif font */
+}
+.logo {
+    max-width: 200px; /* Adjust size based on your logo's dimensions */
+    height: auto;
+    margin-bottom: 2rem;
+}
+/* Body styling */
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f3f3; /* Soft neutral background */
+    background-image: url(../images/background.jpg);
+    background-size: cover;
+    padding: 2rem;
+}
+
+/* Main container for checkout */
+.checkout-container {
+    text-align: center;
+    background-color: #ffffff7e; /* White background for clarity */
+    padding: 3rem;
+    border-radius: 12px; /* Smooth rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+/* Heading */
+h2 {
+    color: #333333; /* Dark gray color for a professional feel */
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: capitalize; /* Capitalized title for a clean, formal look */
+}
+
+/* PayPal button container */
+#paypal-button-container {
+    margin-top: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* PayPal button iframe appearance */
+#paypal-button-container iframe {
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); /* Professional shadow for the button */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 2rem;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
