@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-
 <body>
     <nav class="navbar">
         <div class="navbar-logo">
@@ -18,18 +17,6 @@
                 Shopsyyy.com
             </a>
         </div>
-        <div class="filter-section">
-            <form action="<?php echo URLROOT; ?>/products/filter" method="GET" id="filterForm">
-                <label for="weightFilter">Filter:</label>
-                <select name="weightFilter" id="weightFilter" onchange="document.getElementById('filterForm').submit();">
-                    <option value="">All Products</option>
-                    <option value="zero" <?php echo isset($_GET['weightFilter']) && $_GET['weightFilter'] === 'zero' ? 'selected' : ''; ?>>Digital Products</option>
-                    <option value="nonZero" <?php echo isset($_GET['weightFilter']) && $_GET['weightFilter'] === 'nonZero' ? 'selected' : ''; ?>>Physical Products</option>
-                </select>
-            </form>
-        </div>
-
-
 
         <!-- Hamburger Icon for Mobile -->
         <div class="hamburger" id="hamburger-icon">
@@ -76,6 +63,44 @@
         }
     }
     ?>
+
+    <!-- Filter and Search Section -->
+    <div class="filter-search-container">
+        <!-- Filter Section -->
+        <div class="filter-container">
+            <form action="<?php echo URLROOT; ?>/products/filter" method="GET" id="filterForm">
+                <label for="weightFilter">Filter:</label>
+                <select name="weightFilter" id="weightFilter" onchange="document.getElementById('filterForm').submit();">
+                    <option value="">All Products</option>
+                    <option value="zero" <?php echo isset($_GET['weightFilter']) && $_GET['weightFilter'] === 'zero' ? 'selected' : ''; ?>>Digital Products</option>
+                    <option value="nonZero" <?php echo isset($_GET['weightFilter']) && $_GET['weightFilter'] === 'nonZero' ? 'selected' : ''; ?>>Physical Products</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container">
+            <form action="<?php echo URLROOT; ?>/products/search" method="GET" id="searchForm">
+                <label for="searchQuery" class="sr-only">Search products</label> <!-- Added label for accessibility -->
+
+                <input
+                    type="text"
+                    name="query"
+                    id="searchQuery"
+                    placeholder="Search products..."
+                    value="<?php echo isset($_GET['query']) ? htmlspecialchars($_GET['query']) : ''; ?>"
+                    class="search-input"
+                    aria-label="Search for products"> <!-- Added aria-label for accessibility -->
+
+                <button type="submit" class="search-button">Search</button>
+
+                <!-- Clear Button -->
+                <?php if (isset($_GET['query']) && !empty($_GET['query'])): ?>
+                    <a href="<?php echo URLROOT; ?>/products/search" class="clear-search">Clear</a> <!-- Clear the search query -->
+                <?php endif; ?>
+            </form>
+        </div>
+    </div>
 
     <div id="success-message" style="display: <?php echo $displayMessage ? 'block' : 'none'; ?>; color: green; text-align: center; margin-bottom: 20px;">
         <?php
@@ -179,14 +204,7 @@
         <?php endforeach; ?>
     </div>
 
-
-
-
-
-
     <br>
-    <!-- <a href="<?php echo URLROOT; ?>/digital"><button>Digital Products</button></a>&nbsp; -->
-    <!-- <a href="<?php echo URLROOT; ?>/physical"><button>Physical Products</button></a>&nbsp; -->
     <form action="<?php echo URLROOT; ?>/OrderController/history" method="POST" style="display: inline;">
         <button type="submit" class="red-button">Your Order History</button>
     </form>

@@ -64,43 +64,6 @@ class Products extends Controller
         }
     }
 
-
-    // public function addImage($product_id)
-    // {
-    //     // Only allow access for admin role
-    //     if (!Helper::isAdmin()) {
-    //         Helper::redirect(URLROOT . "/products");
-    //     }
-
-    //     // Retrieve the product ID
-    //     $next_id = $this->productModel->getLastProductId();
-    //     echo "$next_id";
-    //     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    //         // Check if the image is uploaded
-    //         if (isset($_FILES['productImage']) && $_FILES['productImage']['error'][0] == 0) {
-    //             $fileCount = count($_FILES['productImage']['name']);
-
-    //             // Loop through each uploaded file
-    //             for ($i = 0; $i < $fileCount; $i++) {
-    //                 // Get the file name and extension
-    //                 $fileName = $_FILES['productImage']['name'][$i];
-
-    //                 // Store the image name in the database (product_images table)
-    //                 $this->productModel->addProductImage($next_id, $fileName);
-    //             }
-
-    //             // Flash success message and redirect
-    //             Helper::flashMessage('Images uploaded successfully.');
-    //             Helper::redirect(URLROOT . '/products');
-    //         } else {
-    //             Helper::flashMessage('No image was uploaded. Please try again.', 'error');
-    //         }
-    //     } else {
-    //         // Show the upload form and pass the next ID
-    //         $data = ['next_id' => $next_id];
-    //         $this->view('product/add_image', $data);
-    //     }
-    // }
     public function addImage($product_id)
     {
         // Only allow access for admin role
@@ -224,8 +187,54 @@ class Products extends Controller
                 $data[$field] = Helper::sanitizeInput($_PRODUCT[$field] ?? '');
             }
 
+            // Update product details in the database
             $this->productModel->edit($data);
-            Helper::flashMessage('Product updated successfully.');
+
+            // Check if images are uploaded
+            if (isset($_FILES['productImage']) && $_FILES['productImage']['error'][0] == 0) {
+                $fileCount = count($_FILES['productImage']['name']);
+                $uploadDir = getcwd() . "/images/";
+
+                // Check if the upload directory is writable
+                if (!is_writable($uploadDir)) {
+                    Helper::flashMessage('Upload directory is not writable.', 'error');
+                    Helper::redirect(URLROOT . "/products/edit/$id");
+                    exit;
+                }
+
+                // Loop through each uploaded file
+                for ($i = 0; $i < $fileCount; $i++) {
+                    $originalFileName = $_FILES['productImage']['name'][$i];
+                    $tmpFilePath = $_FILES['productImage']['tmp_name'][$i];
+
+                    // Generate a unique name for the file (sanitize the filename)
+                    $sanitizedFileName = basename(preg_replace("/[^a-zA-Z0-9.]/", "_", $originalFileName));
+                    $targetFilePath = $uploadDir . $sanitizedFileName;
+
+                    // Check if the file already exists
+                    if (file_exists($targetFilePath)) {
+                        Helper::flashMessage("File already exists: $sanitizedFileName", 'error');
+                        continue;
+                    }
+
+                    // Try to move the uploaded file
+                    if (move_uploaded_file($tmpFilePath, $targetFilePath)) {
+                        // Save the image name in the database
+                        $this->productModel->addProductImage($id, $sanitizedFileName);
+                    } else {
+                        // Handle upload failure
+                        Helper::flashMessage("Failed to upload image: $originalFileName", 'error');
+                    }
+                }
+
+                // Flash success message if images were uploaded successfully
+                Helper::flashMessage('Images uploaded and saved successfully.');
+            } else {
+                // Handle no image uploaded
+                Helper::flashMessage('No images were uploaded. Please try again.', 'error');
+            }
+
+            // Redirect back to products page
             Helper::redirect(URLROOT . '/products');
         } else {
             $product = $this->productModel->getProductById($id);
@@ -243,6 +252,7 @@ class Products extends Controller
             }
         }
     }
+
 
     public function delete($id)
     {
@@ -272,5 +282,18 @@ class Products extends Controller
         // Flash success message and redirect
         Helper::flashMessage('Product deleted successfully.');
         Helper::redirect(URLROOT . '/products');
+    }
+
+    // Search product part
+    public function search()
+    {
+        $query = isset($_GET['query']) ? trim($_GET['query']) : '';
+
+        if (!empty($query)) {
+            $products = $this->productModel->searchProducts($query);
+            $this->view('product/index', ['products' => $products]);
+        } else {
+            $this->index(); // Load all products if no query
+        }
     }
 }

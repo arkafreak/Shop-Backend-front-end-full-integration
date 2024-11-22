@@ -528,5 +528,73 @@ footer .footer-social-icons a:hover {
     footer .footer-social-icons {
         justify-content: center;
     }
+    
 }
 
+/* Container for both filter and search */
+.filter-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px;
+}
+
+/* Filter Container */
+.filter-container {
+    flex: 1;
+    text-align: left;
+}
+
+/* Search Container */
+.search-container {
+    flex: 2;
+    text-align: center;
+}
+
+/* Search Input Styling */
+.search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 50%;
+}
+
+.search-button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+/* Select Dropdown Styling */
+#weightFilter {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    overflow: hidden;
+}
+.clear-search {
+    color: #f00; /* Red color */
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.clear-search:hover {
+    text-decoration: underline;
+}

@@ -157,4 +157,14 @@ class Product
         $this->db->bind(':weight', $weight);
         return $this->db->resultSet();
     }
+
+    public function searchProducts($query)
+    {
+        $sql = "SELECT p.*, pi.image_name FROM products p
+                LEFT JOIN Product_images pi ON p.id = pi.product_id
+                WHERE p.productName LIKE :query OR p.brand LIKE :query";
+        $this->db->query($sql);
+        $this->db->bind(':query', '%' . $query . '%');
+        return $this->db->resultSet();
+    }
 }
