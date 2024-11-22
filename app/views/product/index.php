@@ -6,47 +6,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/product_style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="navbar-logo">
-            <a href="<?php echo URLROOT; ?>/products" class="navbar-logo-link">
-                <img src="<?php echo URLROOT; ?>/public/images/fox_logo.png" alt="Shopsyyy.com" class="logo-small">
+    <nav class="navbar navbar-expand-lg navbar-dark frosted-navbar fixed-top">
+        <!-- Logo Section -->
+        <a href="<?php echo URLROOT; ?>/products" class="navbar-brand">
+            <img src="<?php echo URLROOT; ?>/public/images/fox_logo.png" alt="Shopsyyy.com" class="logo-small" style="max-width: 150px;">
+            <span class="brand-text fs-4 text-white text-decoration-none d-inline-block position-relative">
                 Shopsyyy.com
-            </a>
-        </div>
+                <span class="hover-underline position-absolute bottom-0 left-0 w-100 h-1 bg-dark d-none"></span>
+            </span>
+        </a>
+
 
         <!-- Hamburger Icon for Mobile -->
-        <div class="hamburger" id="hamburger-icon">
-            <i class="fa fa-bars"></i>
-        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
         <!-- Navbar Menu -->
-        <div class="navbar-menu" id="navbar-menu">
-            <div class="button-container">
-                <div class="button-group">
-                    <?php if ($_SESSION['role'] === 'admin'): ?>
-                        <a href="<?php echo URLROOT; ?>/products/add"><button>Add New Product</button></a>
-                        <a href="<?php echo URLROOT; ?>/DashboardController/index"><button>Dashboard</button></a>
-                    <?php endif; ?>
-                    <a href="<?php echo URLROOT; ?>/categories"><button>Go to categories</button></a>
-                    <a href="<?php echo URLROOT; ?>/choose/options"><button>Home</button></a>
-                </div>
-
-                <?php if ($_SESSION['role'] === 'customer'): ?>
-                    <div class="cart-icon">
-                        <a href="<?php echo URLROOT; ?>/CartController/index"><i class="fa fa-shopping-cart">Cart</i></a>
-                    </div>
+        <div class="collapse navbar-collapse" id="navbarMenu">
+            <ul class="navbar-nav ml-auto">
+                <!-- Admin Links -->
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/products/add" class="btn btn-primary">Add New Product</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/DashboardController/index" class="btn btn-secondary">Dashboard</a>
+                    </li>
                 <?php endif; ?>
 
-                <form action="<?php echo URLROOT; ?>/UserController/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="red-button">Logout</button>
-                </form>
-            </div>
+                <!-- Category and Home Links -->
+                <li class="nav-item">
+                    <a href="<?php echo URLROOT; ?>/categories" class="btn btn-info mr-2 mb-2">Go to Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-info mr-2 mb-2">Home</a>
+                </li>
+
+                <!-- Order History Button -->
+                <li class="nav-item">
+                    <form action="<?php echo URLROOT; ?>/OrderController/purchaseHistory" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">Your Order History</button>
+                    </form>
+                </li>
+
+                <!-- Cart Icon (Customer Only) -->
+                <?php if ($_SESSION['role'] === 'customer'): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/CartController/index" class="nav-link text-light btn-lg">
+                            <i class="fa fa-shopping-cart"></i>Cart
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Logout Button -->
+                <li class="nav-item">
+                    <form action="<?php echo URLROOT; ?>/UserController/logout" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </nav>
+
+    <!-- Add padding to body to prevent content overlap with fixed navbar -->
+    <style>
+        body {
+            padding-top: 80px;
+            /* Adjust this value to match the height of your navbar */
+        }
+    </style>
+
 
     <?php
     // Initialize the variable at the top of your view
@@ -64,7 +103,7 @@
     }
     ?>
 
-    <!-- Filter and Search Section -->
+    <!-- Filter Section -->
     <div class="filter-search-container">
         <!-- Filter Section -->
         <div class="filter-container">
@@ -77,31 +116,30 @@
                 </select>
             </form>
         </div>
-
-        <!-- Search Section -->
-        <div class="search-container">
-            <form action="<?php echo URLROOT; ?>/products/search" method="GET" id="searchForm">
-                <label for="searchQuery" class="sr-only">Search products</label> <!-- Added label for accessibility -->
-
-                <input
-                    type="text"
-                    name="query"
-                    id="searchQuery"
-                    placeholder="Search products..."
-                    value="<?php echo isset($_GET['query']) ? htmlspecialchars($_GET['query']) : ''; ?>"
-                    class="search-input"
-                    aria-label="Search for products"> <!-- Added aria-label for accessibility -->
-
-                <button type="submit" class="search-button">Search</button>
-
-                <!-- Clear Button -->
-                <?php if (isset($_GET['query']) && !empty($_GET['query'])): ?>
-                    <a href="<?php echo URLROOT; ?>/products/search" class="clear-search">Clear</a> <!-- Clear the search query -->
-                <?php endif; ?>
-            </form>
-        </div>
     </div>
 
+    <!-- Search Section -->
+    <div class="search-container">
+        <form action="<?php echo URLROOT; ?>/products/search" method="GET" id="searchForm">
+            <label for="searchQuery" class="sr-only">Search products</label> <!-- Added label for accessibility -->
+
+            <input
+                type="text"
+                name="query"
+                id="searchQuery"
+                placeholder="Search products..."
+                value="<?php echo isset($_GET['query']) ? htmlspecialchars($_GET['query']) : ''; ?>"
+                class="search-input"
+                aria-label="Search for products"> <!-- Added aria-label for accessibility -->
+
+            <button type="submit" class="search-button">Search</button>
+
+            <!-- Clear Button -->
+            <?php if (isset($_GET['query']) && !empty($_GET['query'])): ?>
+                <a href="<?php echo URLROOT; ?>/products/search" class="clear-search">Clear</a> <!-- Clear the search query -->
+            <?php endif; ?>
+        </form>
+    </div>
     <div id="success-message" style="display: <?php echo $displayMessage ? 'block' : 'none'; ?>; color: green; text-align: center; margin-bottom: 20px;">
         <?php
         if ($displayMessage) {
@@ -112,123 +150,131 @@
     </div>
 
     <!-- Product cards -->
-    <div class="product-cards">
-        <?php foreach ($data['products'] as $product):
-            if (isset($_GET['weightFilter'])) {
-                if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
-                if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
-            } ?>
-            <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="product-card-link">
-                <div class="product-card">
-                    <!-- Product Image -->
-                    <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
-                        alt="Product"
-                        class="product-image">
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4">
+            <?php foreach ($data['products'] as $product):
+                if (isset($_GET['weightFilter'])) {
+                    if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
+                    if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
+                } ?>
+                <div class="col">
+                    <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="text-decoration-none">
+                        <div class="card h-100 shadow-lg border border-grey">
+                            <!-- Product Image -->
+                            <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
+                                alt="Product" class="card-img-top img-fluid">
 
-                    <!-- Limited Time Deal Badge -->
-                    <?php
-                    $discount = 0;
-                    if ($product->originalPrice > $product->sellingPrice) {
-                        $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
-                    }
-                    ?>
-                    <?php if ($discount > 60): ?>
-                        <div class="limited-deal">Limited Time Deal</div>
-                    <?php endif; ?>
+                            <!-- Limited Time Deal Badge -->
+                            <?php
+                            $discount = 0;
+                            if ($product->originalPrice > $product->sellingPrice) {
+                                $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
+                            }
+                            ?>
+                            <?php if ($discount > 60): ?>
+                                <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
+                            <?php endif; ?>
 
-                    <!-- Product Name -->
-                    <div class="product-name"><?php echo htmlspecialchars($product->productName); ?></div>
+                            <!-- Card Body -->
+                            <div class="card-body p-2">
+                                <!-- Product Name -->
+                                <h5 class="card-title text-dark mb-2 text-truncate" style="max-width: 100%"><?php echo htmlspecialchars($product->productName); ?></h5>
 
-                    <!-- Product Rating -->
-                    <div class="product-rating">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <span class="star <?php echo $i <= $product->rating ? 'filled' : ''; ?>">★</span>
-                        <?php endfor; ?>
-                        <span class="rating-count">
-                            (<?php echo isset($product->reviewCount) ? htmlspecialchars($product->reviewCount) : '0'; ?>)
-                        </span>
-                    </div>
+                                <!-- Product Rating -->
+                                <div class="product-rating mb-2">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="star <?php echo $i <= $product->rating ? 'text-warning' : 'text-muted'; ?>">★</span>
+                                    <?php endfor; ?>
+                                    <span class="rating-count">
+                                        (<?php echo isset($product->reviewCount) ? htmlspecialchars($product->reviewCount) : '0'; ?>)
+                                    </span>
+                                </div>
 
-                    <!-- Product Price -->
-                    <div class="product-price">
-                        ₹<?php echo number_format($product->sellingPrice); ?>
-                    </div>
+                                <!-- Product Price -->
+                                <p class="card-text text-dark fw-bold">
+                                    ₹<?php echo number_format($product->sellingPrice); ?>
+                                </p>
 
-                    <!-- Original Price and Discount -->
-                    <div class="product-original-price">
-                        M.R.P:
-                        <span class="original-price">₹<?php echo number_format($product->originalPrice); ?></span>
-                        <span class="discount-percent">
-                            (<?php
-                                $discount = 0;
-                                if ($product->originalPrice > $product->sellingPrice) {
-                                    $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
-                                    echo $discount . "% off";
-                                }
-                                ?>)
-                        </span>
-                    </div>
+                                <!-- Original Price and Discount -->
+                                <div class=" align-items-center">
+                                    <p class="text-muted">M.R.P: <span class="text-muted" style="text-decoration: line-through;">₹<?php echo number_format($product->originalPrice); ?></span>
+                                        <?php if ($discount > 0): ?>
+                                            <span class="badge text-danger">-<?php echo $discount . "% off"; ?></span>
+                                        <?php endif; ?>
+                                </div>
 
-                    <!-- Savings -->
-                    <div class="product-savings">
-                        Save ₹<?php echo number_format($product->originalPrice - $product->sellingPrice); ?> with coupon
-                    </div>
 
-                    <!-- Estimated Delivery -->
-                    <div class="product-delivery">
-                        Get it by <strong>Monday, December 9</strong>
-                    </div>
+                                <!-- Savings -->
+                                <p class="text-success">Save ₹<?php echo number_format($product->originalPrice - $product->sellingPrice); ?> with coupon</p>
 
-                    <!-- Action Buttons -->
-                    <div class="card-actions">
-                        <button>view product</button>
+                                <!-- Estimated Delivery -->
+                                <small class="text-muted">Get it by <strong>Monday, December 9</strong></small>
+                            </div>
 
-                        <!-- Admin Actions -->
-                        <?php if ($_SESSION['role'] === 'admin'): ?>
-                            <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>"><button>Edit</button></a>
-                            <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');">
-                                <button class="red-button">Delete</button>
-                            </a>
-                        <?php endif; ?>
+                            <!-- Action Buttons -->
+                            <div class="card-footer text-center">
+                                <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
+                                    <!-- "View Product" Button -->
+                                    <button class="btn btn-outline-primary btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">View Product</button>
 
-                        <!-- Customer Add-to-Cart Button -->
-                        <?php if ($_SESSION['role'] === 'customer'): ?>
-                            <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="add-to-cart-form">
-                                <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
-                                <button type="submit" class="add-to-cart-button">Add to Cart</button>
-                            </form>
-                        <?php endif; ?>
-                    </div>
+                                    <!-- Admin Actions -->
+                                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">Edit</a>
+                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">Delete</a>
+                                    <?php endif; ?>
+
+                                    <!-- Customer Add-to-Cart Button -->
+                                    <?php if ($_SESSION['role'] === 'customer'): ?>
+                                        <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
+                                            <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
+                                            <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto">Add to Cart</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                        </div>
+                    </a>
                 </div>
-            </a>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
 
-    <br>
-    <form action="<?php echo URLROOT; ?>/OrderController/history" method="POST" style="display: inline;">
-        <button type="submit" class="red-button">Your Order History</button>
-    </form>
+
+
     <!-- Footer Section -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <ul>
-                    <li><i class="fa fa-envelope"></i> Email: support@shop.com</li>
-                    <li><i class="fa fa-phone"></i> Phone: 123-456-7890</li>
-                    <li><i class="fa fa-fax"></i> Fax: 123-456-7891</li>
-                </ul>
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Contact Us Section -->
+                <div class="col-md-4">
+                    <h3>Contact Us</h3>
+                    <ul class="list-unstyled">
+                        <li><i class="fa fa-envelope"></i> Email: support@shop.com</li>
+                        <li><i class="fa fa-phone"></i> Phone: 123-456-7890</li>
+                        <li><i class="fa fa-fax"></i> Fax: 123-456-7891</li>
+                    </ul>
+                </div>
+
+                <!-- Location Section -->
+                <div class="col-md-4">
+                    <h3>Location</h3>
+                    <p><i class="fa fa-map-marker"></i> 123 Shop Street, City, Country</p>
+                </div>
+
+                <!-- Address Section -->
+                <div class="col-md-4">
+                    <h3>Address</h3>
+                    <p><i class="fa fa-building"></i> Shop Inc., 123 Business Ave, Suite 101, City, Country</p>
+                </div>
             </div>
-            <div class="footer-section">
-                <h3>Location</h3>
-                <p><i class="fa fa-map-marker"></i> 123 Shop Street, City, Country</p>
-            </div>
-            <div class="footer-section">
-                <h3>Address</h3>
-                <p><i class="fa fa-building"></i> Shop Inc., 123 Business Ave, Suite 101, City, Country</p>
+            <!-- Optional: Add footer credits or links -->
+            <div class="text-center mt-4">
+                <p>&copy; 2024 Shopsyyy.com | All rights reserved.</p>
             </div>
         </div>
     </footer>
+
 
     <script>
         function addToCart(event) {
@@ -264,17 +310,10 @@
                 navbar.classList.remove('shrink');
             }
         });
-
-        // Toggle the navbar menu visibility on hamburger click
-        const hamburgerIcon = document.getElementById('hamburger-icon');
-        const navbarMenu = document.getElementById('navbar-menu');
-
-        document.getElementById('hamburger-icon').addEventListener('click', function() {
-            const menu = document.getElementById('navbar-menu');
-            menu.style.display = (menu.style.display === 'block' ? 'none' : 'block');
-        });
     </script>
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

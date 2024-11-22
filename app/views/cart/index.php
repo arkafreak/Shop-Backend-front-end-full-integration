@@ -5,130 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart</title>
-    <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/cart_style.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Optional Custom CSS -->
+    <!-- <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/cart_style.css"> -->
 </head>
 
-<body>
-    <h1>Your Shopping Cart</h1>
-    <div class="cart-container">
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4 text-dark">Your Shopping Cart</h1>
 
+        <!-- Cart Container -->
+        <div class="cart-container">
+            <?php if (!empty($data['cartItems'])): ?>
+                <!-- Cart Items -->
+                <div class="cart-items mb-4">
+                    <?php
+                    $totalAmount = 0;
+                    foreach ($data['cartItems'] as $item):
+                        $itemTotal = $item->quantity * $item->sellingPrice;
+                        $totalAmount += $itemTotal;
+                    ?>
+                        <div class="cart-item row align-items-center border rounded shadow-sm mb-3 p-2 bg-white">
+                            <div class="col-4 col-md-3">
+                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded">
+                            </div>
+                            <div class="col-8 col-md-6">
+                                <h5 class="mb-2 text-truncate" style="max-width: 250px;"><?php echo htmlspecialchars($item->productName); ?></h5>
+                                <p class="text-muted mb-1">Brand: <?php echo htmlspecialchars($item->brand); ?></p>
+                                <p class="mb-1">Price: ₹<?php echo number_format($item->sellingPrice); ?></p>
+                                <p class="mb-1">Quantity: <?php echo htmlspecialchars($item->quantity); ?></p>
+                                <p class="fw-bold mb-2">Total: ₹<?php echo number_format($itemTotal); ?></p>
 
-        <?php if (!empty($data['cartItems'])): ?>
-            <div class="cart-items">
-                <?php
-                $totalAmount = 0;
-                foreach ($data['cartItems'] as $item):
-                    $itemTotal = $item->quantity * $item->sellingPrice;
-                    $totalAmount += $itemTotal;
-                ?>
-                    <div class="cart-item">
-                        <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="cart-item-image">
+                                <!-- Quantity Actions -->
+                                <div class="d-flex">
+                                    <!-- Decrease Quantity -->
+                                    <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
+                                        <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
+                                        <input type="hidden" name="action" value="decrease">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">-</button>
+                                    </form>
 
-                        <div class="item-details">
-                            <h3><?php echo htmlspecialchars($item->productName); ?></h3>
-                            <p class="brand">Brand: <?php echo htmlspecialchars($item->brand); ?></p>
-                            <p class="price">Price: ₹<?php echo number_format($item->sellingPrice); ?></p>
-                            <p class="quantity">Quantity: <?php echo htmlspecialchars($item->quantity); ?></p>
-                            <p class="total">Total: ₹<?php echo number_format($itemTotal); ?></p>
+                                    <!-- Increase Quantity -->
+                                    <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
+                                        <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
+                                        <input type="hidden" name="action" value="increase">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">+</button>
+                                    </form>
 
-                            <div class="quantity-actions">
-                                <!-- Decrease quantity -->
-                                <form action="<?php echo URLROOT; ?>/CartController/update" method="POST">
-                                    <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
-                                    <input type="hidden" name="action" value="decrease">
-                                    <button type="submit" class="quantity-button">-</button>
-                                </form>
-
-                                <!-- Increase quantity -->
-                                <form action="<?php echo URLROOT; ?>/CartController/update" method="POST">
-                                    <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
-                                    <input type="hidden" name="action" value="increase">
-                                    <button type="submit" class="quantity-button">+</button>
-                                </form>
-
-                                <!-- Remove item -->
-                                <form action="<?php echo URLROOT; ?>/CartController/removeItem" method="POST">
-                                    <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
-                                    <input type="hidden" name="action" value="remove">
-                                    <button type="submit" class="remove-button">Remove</button>
-                                </form>
+                                    <!-- Remove Item -->
+                                    <form action="<?php echo URLROOT; ?>/CartController/removeItem" method="POST">
+                                        <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+                    <?php endforeach; ?>
+                </div>
 
-            <div class="cart-summary" id="cart-summary">
-                <h3>Order Summary</h3>
-                <p>Total Amount: ₹<?php echo number_format($totalAmount); ?></p>
-                <form action="<?php echo URLROOT; ?>/OrderController/addressPayment" method="POST">
-                    <button type="submit" class="place-order-button">Place Order</button>
-                </form>
-                <a href="<?php echo URLROOT; ?>/products" class="back-button">Back to Products</a>
-            </div>
+                <!-- Cart Summary -->
+                <div class="cart-summary p-3 bg-white rounded shadow-sm border">
+                    <h3 class="mb-3">Order Summary</h3>
+                    <p><strong>Total Amount:</strong> ₹<?php echo number_format($totalAmount); ?></p>
 
-        <?php else: ?>
-            <div class="empty-cart">
-                <p>Your cart is empty.</p>
-                <a href="<?php echo URLROOT; ?>/products" class="continue-shopping-button">Continue Shopping</a>
-            </div>
-        <?php endif; ?>
+                    <!-- Place Order Button -->
+                    <form action="<?php echo URLROOT; ?>/OrderController/addressPayment" method="POST">
+                        <button type="submit" class="btn btn-success w-100 mb-3">Place Order</button>
+                    </form>
+
+                    <!-- Back to Products Button -->
+                    <a href="<?php echo URLROOT; ?>/products" class="btn btn-outline-secondary w-100">Back to Products</a>
+                </div>
+            <?php else: ?>
+                <!-- Empty Cart -->
+                <div class="empty-cart text-center">
+                    <p>Your cart is empty.</p>
+                    <a href="<?php echo URLROOT; ?>/products" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const cartSummary = document.getElementById("cart-summary");
-
-            let isDragging = false;
-            let offsetX, offsetY;
-
-            cartSummary.addEventListener("touchstart", (e) => {
-                const touch = e.touches[0];
-                offsetX = touch.clientX - cartSummary.getBoundingClientRect().left;
-                offsetY = touch.clientY - cartSummary.getBoundingClientRect().top;
-                isDragging = true;
-            });
-
-            cartSummary.addEventListener("touchmove", (e) => {
-                if (!isDragging) return;
-
-                const touch = e.touches[0];
-                const newX = touch.clientX - offsetX;
-                const newY = touch.clientY - offsetY;
-
-                cartSummary.style.left = `${newX}px`;
-                cartSummary.style.top = `${newY}px`;
-
-                e.preventDefault(); // Prevent scrolling while dragging
-            });
-
-            cartSummary.addEventListener("touchend", () => {
-                isDragging = false;
-            });
-
-            cartSummary.addEventListener("mousedown", (e) => {
-                offsetX = e.clientX - cartSummary.getBoundingClientRect().left;
-                offsetY = e.clientY - cartSummary.getBoundingClientRect().top;
-                isDragging = true;
-            });
-
-            document.addEventListener("mousemove", (e) => {
-                if (!isDragging) return;
-
-                const newX = e.clientX - offsetX;
-                const newY = e.clientY - offsetY;
-
-                cartSummary.style.left = `${newX}px`;
-                cartSummary.style.top = `${newY}px`;
-
-                e.preventDefault(); // Prevent text selection while dragging
-            });
-
-            document.addEventListener("mouseup", () => {
-                isDragging = false;
-            });
-        });
-    </script>
 </body>
 
 </html>
