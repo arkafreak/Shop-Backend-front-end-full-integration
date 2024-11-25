@@ -225,19 +225,19 @@
                                 <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
                                     <!-- "View Product" Button -->
                                     <?php if ($_SESSION['role'] === 'customer'): ?>
-                                        <button class="btn btn-outline-primary btn-sm mr-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
+                                        <button class="btn btn-outline-primary btn-sm m-2 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
                                     <?php endif; ?>
                                     <!-- Admin Actions -->
                                     <?php if ($_SESSION['role'] === 'admin'): ?>
-                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm mr-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
-                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
+                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
+                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
                                     <?php endif; ?>
 
                                     <!-- Customer Add-to-Cart Button -->
                                     <?php if ($_SESSION['role'] === 'customer'): ?>
                                         <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
                                             <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
-                                            <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto">Add to Cart</button>
+                                            <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto mt-2 mb-2">Cart</button>
                                         </form>
                                     <?php endif; ?>
                                 </div>
