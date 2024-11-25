@@ -1,106 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Category</title>
-    <link rel="stylesheet" href="/path/to/your/style.css"> <!-- Adjust path to your CSS -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: flex-start; /* Align button to the left */
-            margin-top: 20px; /* Space above the button container */
-        }
-
-        .button-container a {
-            text-decoration: none;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 5px;
-            text-align: center;
-            border: 1px solid #ccc;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            color: #333;
-        }
-
-        .warning {
-            font-weight: bold;
-            color: red;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            button {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            table {
-                font-size: 14px;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Category: <?php echo htmlspecialchars($data['category']->categoryName); ?></h1>
 
-    <h2>Products under this Category:</h2>
-    <table border="1">
-        <tr>
-            <th>Product Name</th>
-        </tr>
-        <?php if (!empty($data['products'])): ?>
-            <?php foreach ($data['products'] as $product): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($product->productName); ?></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td>No products found under this category.</td>
-            </tr>
-        <?php endif; ?>
-    </table>
-
-    <!-- Go Back button positioned below the table -->
-    <div class="button-container">
-        <a href="<?php echo URLROOT; ?>/categories"><button>Go Back</button></a>
+<body class="bg-light">
+    <div class="container my-5">
+        <!-- Category Header -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Category: <?php echo htmlspecialchars($data['category']->categoryName); ?></h3>
+            </div>
+            <div class="card-body">
+                <!-- Products Table -->
+                <h4 class="mb-3">Products under this Category:</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Product Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($data['products'])): ?>
+                                <?php foreach ($data['products'] as $product): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($product->productName); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="1" class="text-muted">No products found under this category.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Back Button -->
+                <div class="d-flex justify-content-end">
+                    <a href="<?php echo URLROOT; ?>/categories" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

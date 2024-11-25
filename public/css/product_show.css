@@ -29,7 +29,7 @@ body {
 .carousel-container {
     position: relative;
     width: 70%;
-    height: 400px;
+    /* height: 400px; */
     overflow: hidden;
     border-radius: 10px;
 }

@@ -37,27 +37,30 @@
                 <!-- Admin Links -->
                 <?php if ($_SESSION['role'] === 'admin'): ?>
                     <li class="nav-item">
-                        <a href="<?php echo URLROOT; ?>/products/add" class="btn btn-primary">Add New Product</a>
+                        <a href="<?php echo URLROOT; ?>/products/add" class="btn btn-success mr-2 mb-2"><i class="fas fa-plus"></i>Add New Product</a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo URLROOT; ?>/DashboardController/index" class="btn btn-secondary">Dashboard</a>
+                        <a href="<?php echo URLROOT; ?>/DashboardController/index" class="btn btn-secondary mr-2 mb-2">Dashboard</a>
+                    </li>
+                    <!-- category button -->
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/categories" class="btn btn-info mr-2 mb-2"><i class="fas fa-boxes"></i>Go to Categories</a>
                     </li>
                 <?php endif; ?>
 
                 <!-- Category and Home Links -->
                 <li class="nav-item">
-                    <a href="<?php echo URLROOT; ?>/categories" class="btn btn-info mr-2 mb-2">Go to Categories</a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-info mr-2 mb-2">Home</a>
+                    <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-info mr-2 mb-2"><i class="fas fa-home"></i> Home</a>
                 </li>
 
                 <!-- Order History Button -->
-                <li class="nav-item">
-                    <form action="<?php echo URLROOT; ?>/OrderController/purchaseHistory" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-warning">Your Order History</button>
-                    </form>
-                </li>
+                <?php if ($_SESSION['role'] === 'customer'): ?>
+                    <li class="nav-item">
+                        <form action="<?php echo URLROOT; ?>/OrderController/purchaseHistory" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-warning">Your Order History</button>
+                        </form>
+                    </li>
+                <?php endif; ?>
 
                 <!-- Cart Icon (Customer Only) -->
                 <?php if ($_SESSION['role'] === 'customer'): ?>
@@ -71,7 +74,7 @@
                 <!-- Logout Button -->
                 <li class="nav-item">
                     <form action="<?php echo URLROOT; ?>/UserController/logout" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-danger">Logout</button>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </form>
                 </li>
             </ul>
@@ -162,7 +165,7 @@
                         <div class="card h-100 shadow-lg border border-grey">
                             <!-- Product Image -->
                             <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
-                                alt="Product" class="card-img-top img-fluid">
+                                alt="Product" class="card-img-top product-img">
 
                             <!-- Limited Time Deal Badge -->
                             <?php
@@ -171,8 +174,10 @@
                                 $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
                             }
                             ?>
-                            <?php if ($discount > 60): ?>
-                                <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
+                            <?php if ($_SESSION['role'] === 'customer'): ?>
+                                <?php if ($discount > 60): ?>
+                                    <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
+                                <?php endif; ?>
                             <?php endif; ?>
 
                             <!-- Card Body -->
@@ -215,12 +220,13 @@
                             <div class="card-footer text-center">
                                 <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
                                     <!-- "View Product" Button -->
-                                    <button class="btn btn-outline-primary btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">View Product</button>
-
+                                    <?php if ($_SESSION['role'] === 'customer'): ?>
+                                        <button class="btn btn-outline-primary btn-sm mr-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
+                                    <?php endif; ?>
                                     <!-- Admin Actions -->
                                     <?php if ($_SESSION['role'] === 'admin'): ?>
-                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">Edit</a>
-                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto">Delete</a>
+                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm mr-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
+                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm mb-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
                                     <?php endif; ?>
 
                                     <!-- Customer Add-to-Cart Button -->
@@ -239,6 +245,20 @@
             <?php endforeach; ?>
         </div>
     </div>
+
+    <style>
+        /* Product Image Styling */
+        .product-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            /* Ensures image fits container without distortion */
+            max-width: 100%;
+            max-height: 250px;
+            /* You can adjust the height if needed */
+        }
+    </style>
+
 
 
 

@@ -1,21 +1,26 @@
 body {
     overflow-x: hidden;
 }
+
 .navbar.shrink {
     padding: 4px 0;
     /* Reduced padding when scrolling */
     background-color: rgba(35, 47, 62, 0.719);
     /* Solid color when scrolled */
 }
+
 .navbar.shrink .navbar-logo a {
-    color: rgb(255, 255, 255); /* Color when navbar shrinks */
+    color: rgb(255, 255, 255);
+    /* Color when navbar shrinks */
 }
+
 .logo-small {
     width: 50px;
     height: auto;
     margin-right: 10px;
     /* Adds space between the image and the text */
 }
+
 /* Container for both filter and search */
 .filter-search-container {
     display: flex;
@@ -59,22 +64,29 @@ body {
 
 /* Frosted Glass Effect for Navbar */
 .frosted-navbar {
-    background: rgba(0, 0, 0, 0.623); /* Semi-transparent dark background */
-    backdrop-filter: blur(15px); /* Apply blur effect to the background */
-    -webkit-backdrop-filter: blur(10px); /* For Safari */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Slight shadow for depth */
+    background: rgba(0, 0, 0, 0.623);
+    /* Semi-transparent dark background */
+    backdrop-filter: blur(15px);
+    /* Apply blur effect to the background */
+    -webkit-backdrop-filter: blur(10px);
+    /* For Safari */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    /* Slight shadow for depth */
 }
 
 /* Navbar Text Colors */
 .navbar-dark .navbar-nav .nav-link,
 .navbar-dark .navbar-brand {
-    color: #fff; /* Ensure text is visible on dark background */
+    color: #fff;
+    /* Ensure text is visible on dark background */
 }
 
 /* Optional: Add some hover effects */
 .navbar-nav .nav-link:hover {
-    color: #FFD700; /* Gold color for hover effect */
+    color: #FFD700;
+    /* Gold color for hover effect */
 }
+
 .navbar-toggler-icon {
     width: 30px;
     height: 30px;
@@ -83,10 +95,24 @@ body {
 .navbar-collapse {
     padding: 10px;
 }
+
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000; /* Ensures the navbar is always on top */
-    transition: all 0.3s ease-in-out; /* Smooth transition on scroll */
+    z-index: 1000;
+    /* Ensures the navbar is always on top */
+    transition: all 0.3s ease-in-out;
+    /* Smooth transition on scroll */
+}
+
+.search-container {
+    margin-top: -50px;
+}
+
+@media (max-width: 1080px) {
+    .search-container {
+        margin-top: 5px;
+    }
+
 }
