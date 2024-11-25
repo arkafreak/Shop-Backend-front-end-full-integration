@@ -42,8 +42,8 @@
             <p class="brand"><?php echo htmlspecialchars($data['brand']); ?></p>
             <p class="category"><?php echo htmlspecialchars($data['categoryName']); ?></p>
             <div class="pricing">
-                <p class="original-price">₹<?php echo htmlspecialchars($data['originalPrice']); ?></p>
-                <p class="selling-price">₹<?php echo htmlspecialchars($data['sellingPrice']); ?></p>
+                <p class="original-price">₹<?php echo number_format($data['originalPrice']); ?></p>
+                <p class="selling-price">₹<?php echo number_format($data['sellingPrice']); ?></p>
             </div>
             <p class="weight">Weight: <?php echo htmlspecialchars($data['weight']); ?></p>
 
