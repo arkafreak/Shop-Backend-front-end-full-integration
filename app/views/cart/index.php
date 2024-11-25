@@ -7,11 +7,27 @@
     <title>Your Cart</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Optional Custom CSS -->
-    <!-- <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/cart_style.css"> -->
 </head>
 
 <body class="bg-light">
+
+    <!-- Header -->
+    <header class="bg-dark text-white py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="<?php echo URLROOT; ?>/products" class="text-white text-decoration-none h4">Shopsyyy</a>
+                <nav class="d-flex">
+                    <a href="<?php echo URLROOT; ?>/products" class="btn btn-outline-light me-2">Home</a>
+                    <a href="<?php echo URLROOT; ?>/CartController/index" class="btn btn-outline-light me-2">Cart</a>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                        <a href="<?php echo URLROOT; ?>/OrderController/purchaseHistory" class="btn btn-outline-light">Order History</a>
+                    <?php endif; ?>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content: Cart -->
     <div class="container mt-5">
         <h1 class="text-center mb-4 text-dark">Your Shopping Cart</h1>
 
@@ -86,6 +102,15 @@
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Shop4. All Rights Reserved.</p>
+            <p>Designed by <a href="#" class="text-white text-decoration-none">&copy; arkafreak</a></p>
+        </div>
+    </footer>
+
     <!-- Bootstrap JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 

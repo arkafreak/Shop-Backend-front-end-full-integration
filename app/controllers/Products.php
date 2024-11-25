@@ -3,6 +3,7 @@ class Products extends Controller
 {
     private $productModel;
     private $categoryModel;
+    private $cartModel;
 
     public function __construct()
     {
@@ -15,18 +16,35 @@ class Products extends Controller
         // Initialize the Product and Category models
         $this->productModel = $this->model('Product');
         $this->categoryModel = $this->model('Category');
+        $this->cartModel = $this->model('CartModel');
     }
 
     public function index()
     {
+        // Retrieve userId from session
+        $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
         // Retrieve all products
-        // $products = $this->productModel->getAllProducts();
-        // $data = [
-        //     'products' => $products
-        // ];
-        $data['products'] = $this->productModel->getAllProductsWithImages();
+        $products = $this->productModel->getAllProductsWithImages();
+
+        // Get the cart item count for the user if logged in
+        $cartItemCount = 0;
+        if ($userId) {
+            $cartItemCount = $this->cartModel->count($userId);
+            $cartItemCount = isset($cartItemCount[0]->count) ? $cartItemCount[0]->count : 0;
+        }
+
+        // Prepare data to pass to the view
+        $data = [
+            'products' => $products,
+            'cartItemCount' => $cartItemCount
+        ];
+
+        // Load the view
         $this->view('product/index', $data);
     }
+
+
 
     public function add()
     {

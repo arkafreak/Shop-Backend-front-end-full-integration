@@ -165,4 +165,15 @@ class CartModel
         $this->db->bind(':userId', $userId);
         return $this->db->resultSet(); // Fetch all results
     }
+
+    public function count($userId)
+    {
+        $query = "SELECT count(*) as count FROM cart WHERE userId = :userId";  // Alias count as count
+        $this->db->query($query);
+        $this->db->bind(':userId', $userId);
+        $result = $this->db->resultSet(); // Fetch all results
+
+        // Debugging: Print the result to check the structure
+        return $result;
+    }
 }

@@ -152,4 +152,8 @@ class Database
     {
         return $this->dbh->rollBack();
     }
+
+    public function escape($string) {
+        return $this->dbh->quote($string);
+    }
 }

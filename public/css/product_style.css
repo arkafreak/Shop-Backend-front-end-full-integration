@@ -74,6 +74,19 @@ body {
     /* Slight shadow for depth */
 }
 
+/* Adjust badge positioning */
+.nav-link {
+    position: relative;
+}
+
+.badge1 {
+    position: absolute;
+    top: 1px;
+    right: 45px;
+    font-size: 0.7rem;
+}
+
+
 /* Navbar Text Colors */
 .navbar-dark .navbar-nav .nav-link,
 .navbar-dark .navbar-brand {
@@ -114,5 +127,15 @@ body {
     .search-container {
         margin-top: 5px;
     }
+    .nav-link {
+        position: relative;
+    }
+    .badge1 {
+        position: sticky;
+        /* bottom: 50px; */
+        left: 1px;
+        font-size: 0.7rem;
+    }
+
 
 }

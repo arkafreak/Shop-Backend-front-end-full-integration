@@ -66,10 +66,14 @@
                 <?php if ($_SESSION['role'] === 'customer'): ?>
                     <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/CartController/index" class="nav-link text-light btn-lg">
-                            <i class="fa fa-shopping-cart"></i>Cart
+                            <i class="fa fa-shopping-cart"></i> Cart
+                            <?php if (isset($data['cartItemCount']) && $data['cartItemCount'] > 0): ?>
+                                <span class="badge1 badge-pill badge-danger"><?php echo $data['cartItemCount']; ?></span>
+                            <?php endif; ?>
                         </a>
                     </li>
                 <?php endif; ?>
+
 
                 <!-- Logout Button -->
                 <li class="nav-item">
