@@ -180,4 +180,11 @@ class OrderModel
         $this->db->query($query);
         return $this->db->resultSet();
     }
+    public function getProductImageByProductId($id)
+    {
+        $query = "SELECT image_name FROM Product_images WHERE product_id = :id LIMIT 1";
+        $this->db->query($query);
+        $this->db->bind(':id', $id);
+        return $this->db->single(); // Returns the image record
+    }
 }

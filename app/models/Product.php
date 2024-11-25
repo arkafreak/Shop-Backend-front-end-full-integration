@@ -134,7 +134,7 @@ class Product
 
         return $result['last_product_id'] ?? 0;  // Return 0 if no products exist
     }
-
+    // getting the product image
     public function getProductImageByProductId($id)
     {
         $query = "SELECT image_name FROM Product_images WHERE product_id = :id LIMIT 1";
