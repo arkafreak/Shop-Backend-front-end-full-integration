@@ -59,15 +59,18 @@
                 <ul class="navbar-nav ms-auto">
                     <?php if ($_SESSION['role'] === 'customer'): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo URLROOT; ?>/products">View Products</a>
+                            <a href="<?php echo URLROOT; ?>/products" class="btn btn-primary mr-2 mb-2" a>View Products</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo URLROOT; ?>/products">Products</a>
+                            <a href="<?php echo URLROOT; ?>/products" class="btn btn-primary mr-2 mb-2">Products</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo URLROOT; ?>/categories">Categories</a>
+                            <a href="<?php echo URLROOT; ?>/categories" class="btn btn-primary mr-2 mb-2">Categories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?php echo URLROOT; ?>/DashboardController/index" class="btn btn-primary mr-2 mb-2">Dashboard</a>
                         </li>
                     <?php endif; ?>
                     <li class="nav-item">
@@ -94,7 +97,12 @@
 
     <!-- Welcome Section -->
     <header class="container mt-4 text-center">
-        <h1 class="mb-3">Hey <?php echo $userName; ?>, Welcome to the Shop!</h1>
+        <?php if (!empty($userName)): ?>
+            <h1 class="mb-3">Hey <?php echo $userName; ?>, Welcome to the Shop!</h1>
+        <?php else: ?>
+            <h1 class="mb-3">Hey, Welcome to the Shopsyyy!</h1>
+        <?php endif; ?>
+
         <?php if (!empty($_SESSION['loginMessage'])): ?>
             <div id="loginMessage" class="alert alert-success">
                 <?php echo $_SESSION['loginMessage']; ?>
