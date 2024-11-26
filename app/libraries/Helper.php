@@ -98,4 +98,16 @@ class Helper
         unset($_SESSION["user"]);
         session_destroy();
     }
+    public static function flash($name, $message = '', $class = 'alert alert-success')
+    {
+        if (!empty($message)) {
+            $_SESSION[$name] = $message;
+            $_SESSION[$name . '_class'] = $class;
+        } elseif (!empty($_SESSION[$name])) {
+            $class = $_SESSION[$name . '_class'] ?? '';
+            echo "<div class='{$class}'>{$_SESSION[$name]}</div>";
+            unset($_SESSION[$name]);
+            unset($_SESSION[$name . '_class']);
+        }
+    }
 }

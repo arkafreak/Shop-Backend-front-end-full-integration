@@ -27,7 +27,7 @@
                 <li class="nav-item"><a href="<?php echo URLROOT; ?>/Products/index" class="nav-link">Products</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Orders</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Sales</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Users</a></li>
+                <li class="nav-item"><a href="#users-section" class="nav-link">Manage Users</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Reports</a></li>
                 <li class="nav-item"><a href="#bottom-section" class="nav-link">Graphs and Charts</a></li>
             </ul>
@@ -112,6 +112,44 @@
                     </div>
                 </div>
             </section>
+            <!-- Section to manage users -->
+            <section id="users-section" class="my-5">
+                <div class="container">
+                    <h2 class="section-title text-center mb-4">Manage Users</h2>
+                    <div class="table-responsive shadow-sm rounded">
+                        <table class="table table-hover table-striped align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Created At</th>
+                                    <th scope="col" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($data['users'] as $user): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($user->id); ?></td>
+                                        <td><?php echo htmlspecialchars($user->name); ?></td>
+                                        <td><?php echo htmlspecialchars($user->email); ?></td>
+                                        <td><?php echo htmlspecialchars($user->role); ?></td>
+                                        <td><?php echo htmlspecialchars($user->createdAt); ?></td>
+                                        <td class="text-center">
+                                            <form action="<?php echo URLROOT; ?>/DashboardController/deleteUser/<?php echo $user->id; ?>" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                <button type="submit" class="btn btn-danger btn-sm px-3">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -178,6 +216,17 @@
         $(document).ready(function() {
             $(".navbar-toggler").click(function() {
                 $(".sidebar").toggleClass("show");
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteButtons = document.querySelectorAll("form[action*='deleteUser'] button");
+            deleteButtons.forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    if (!confirm("Are you sure you want to delete this user?")) {
+                        event.preventDefault();
+                    }
+                });
             });
         });
     </script>

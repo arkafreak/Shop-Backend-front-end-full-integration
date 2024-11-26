@@ -49,4 +49,18 @@ class UserModel
         // Return the name if found, otherwise return null
         return $result ? $result[0]->name : null; // Adjust according to your result format
     }
+    // function to delete user by id from the admin panel;
+    public function deleteUserById($id)
+    {
+        $this->db->query("DELETE FROM users WHERE id = :id");
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+
+    //function to get all users to show!
+    public function getUsers()
+    {
+        $this->db->query("SELECT * FROM users WHERE role = 'customer' ORDER BY createdAt DESC");
+        return $this->db->resultSet();
+    }
 }
