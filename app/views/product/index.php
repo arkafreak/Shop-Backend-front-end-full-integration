@@ -35,7 +35,7 @@
         <div class="collapse navbar-collapse" id="navbarMenu">
             <ul class="navbar-nav ml-auto">
                 <!-- Admin Links -->
-                <?php if ($_SESSION['role'] === 'admin'): ?>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                     <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/products/add" class="btn btn-success mr-2 mb-2"><i class="fas fa-plus"></i>Add New Product</a>
                     </li>
@@ -49,12 +49,12 @@
                 <?php endif; ?>
 
                 <!-- Category and Home Links -->
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-info mr-2 mb-2"><i class="fas fa-home"></i> Home</a>
-                </li>
+                </li> -->
 
                 <!-- Order History Button -->
-                <?php if ($_SESSION['role'] === 'customer'): ?>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                     <li class="nav-item">
                         <form action="<?php echo URLROOT; ?>/OrderController/purchaseHistory" method="POST" style="display: inline;">
                             <button type="submit" class="btn btn-warning">Your Order History</button>
@@ -63,7 +63,7 @@
                 <?php endif; ?>
 
                 <!-- Cart Icon (Customer Only) -->
-                <?php if ($_SESSION['role'] === 'customer'): ?>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                     <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/CartController/index" class="nav-link text-light btn-lg">
                             <i class="fa fa-shopping-cart"></i> Cart
@@ -76,23 +76,28 @@
 
 
                 <!-- Logout Button -->
-                <li class="nav-item">
-                    <form action="<?php echo URLROOT; ?>/UserController/logout" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </form>
-                </li>
+                <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'customer' || $_SESSION['role'] === 'admin')): ?>
+                    <li class="nav-item">
+                        <form action="<?php echo URLROOT; ?>/UserController/logout" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </form>
+                    </li>
+                <?php endif; ?>
+                <?php if (!isset($_SESSION['role'])): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/UserController/register" class="btn btn-primary mr-2 mb-2">
+                            Register
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/UserController/login" class="btn btn-outline-primary">
+                            Login
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </nav>
-
-    <!-- Add padding to body to prevent content overlap with fixed navbar -->
-    <style>
-        body {
-            padding-top: 80px;
-            /* Adjust this value to match the height of your navbar */
-        }
-    </style>
-
 
     <?php
     // Initialize the variable at the top of your view
@@ -158,7 +163,7 @@
 
     <!-- Product cards -->
     <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4 mb-4">
             <?php foreach ($data['products'] as $product):
                 if (isset($_GET['weightFilter'])) {
                     if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
@@ -178,7 +183,7 @@
                                 $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
                             }
                             ?>
-                            <?php if ($_SESSION['role'] === 'customer'): ?>
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                                 <?php if ($discount > 60): ?>
                                     <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
                                 <?php endif; ?>
@@ -224,17 +229,17 @@
                             <div class="card-footer text-center">
                                 <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
                                     <!-- "View Product" Button -->
-                                    <?php if ($_SESSION['role'] === 'customer'): ?>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                                         <button class="btn btn-outline-primary btn-sm m-2 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
                                     <?php endif; ?>
                                     <!-- Admin Actions -->
-                                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                                         <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
                                         <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
                                     <?php endif; ?>
 
                                     <!-- Customer Add-to-Cart Button -->
-                                    <?php if ($_SESSION['role'] === 'customer'): ?>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                                         <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
                                             <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
                                             <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto mt-2 mb-2">Cart</button>

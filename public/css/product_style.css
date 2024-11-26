@@ -1,5 +1,10 @@
 body {
     overflow-x: hidden;
+    padding-top: 80px;
+    /* Adjust this value to match the height of your navbar */
+    background-image: url(../images/background.jpg);
+    background-size: cover;
+
 }
 
 .navbar.shrink {
@@ -127,9 +132,11 @@ body {
     .search-container {
         margin-top: 5px;
     }
+
     .nav-link {
         position: relative;
     }
+
     .badge1 {
         position: sticky;
         /* bottom: 50px; */

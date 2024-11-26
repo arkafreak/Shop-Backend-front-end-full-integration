@@ -46,17 +46,9 @@ class UserController extends Controller
 
     public function login()
     {
-        // Redirect to options page if user is already logged in
-        // if (isset($_SESSION['user_id'])) {
-        //     header("Location: " . URLROOT . "/choice/options"); // Redirect to the desired page
-        //     exit(); // Always exit after redirect
-        // }
-
-        // Initialize data with default values
         $data = [
             'email' => '',
             'password' => '',
-            'role' => '',
             'loginError' => ''
         ];
 
@@ -65,35 +57,39 @@ class UserController extends Controller
             $_USER = filter_input_array(INPUT_POST);
             $data['email'] = trim($_USER['email']);
             $data['password'] = trim($_USER['password']);
-            $data['role'] = trim($_USER['role']);
 
-            // Fetch user by email
-            $user = $this->userModel->getUserByEmail($data['email'], $data['role']);
+            // Fetch user by email (no need to pass role anymore)
+            $user = $this->userModel->getUserByEmail($data['email']);
 
             if ($user) {
                 // Check password
                 if (password_verify($data['password'], $user->password)) {
-                    // Store user ID in session
+                    // Store user ID, name, and role in session
                     $_SESSION['name'] = $user->name;
                     $_SESSION['user_id'] = $user->id;
                     $_SESSION['role'] = $user->role;
                     // Set login success message
                     $_SESSION['loginMessage'] = "Login successful!";
 
-                    // Redirect to options page
-                    header("Location: " . URLROOT . "/choice/options");
+                    // Redirect based on role (admin or customer)
+                    if ($user->role == 'admin') {
+                        header("Location: " . URLROOT . "/products/index");
+                    } else {
+                        header("Location: " . URLROOT . "/products/index");
+                    }
                     exit(); // Always exit after redirect
                 } else {
                     $data['loginError'] = "Invalid email or password"; // Set error message
                 }
             } else {
-                $data['loginError'] = "User not found under this role"; // Set error message
+                $data['loginError'] = "User not found"; // Set error message
             }
         }
 
         // Load the login view with the data
         $this->view('user/login', $data);
     }
+
 
 
 

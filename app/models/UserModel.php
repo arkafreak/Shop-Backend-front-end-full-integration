@@ -27,11 +27,11 @@ class UserModel
         }
     }
 
-    public function getUserByEmail($email, $role)
+    public function getUserByEmail($email)
     {
-        $this->db->query("SELECT * FROM users WHERE email = :email AND role = :role");
+        $this->db->query("SELECT * FROM users WHERE email = :email");
         $this->db->bind(':email', $email);
-        $this->db->bind(':role', $role);
+        // $this->db->bind(':role', $role);
         return $this->db->single(); // Fetch a single record
         // This should return an object or an associative array
     }

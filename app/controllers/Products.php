@@ -9,9 +9,9 @@ class Products extends Controller
     {
         // Start session and check if user is logged in
         Helper::startSession();
-        if (!Helper::isLoggedIn()) {
-            Helper::redirect(URLROOT . "/UserController/login"); // Redirect to login if not authenticated
-        }
+        // if (!Helper::isLoggedIn()) {
+        //     Helper::redirect(URLROOT . "/UserController/login"); // Redirect to login if not authenticated
+        // }
 
         // Initialize the Product and Category models
         $this->productModel = $this->model('Product');
