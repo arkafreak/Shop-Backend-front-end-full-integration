@@ -63,4 +63,29 @@ class UserModel
         $this->db->query("SELECT * FROM users WHERE role = 'customer' ORDER BY createdAt DESC");
         return $this->db->resultSet();
     }
+    // get user by id
+    public function getUserById($userId)
+    {
+        $this->db->query('SELECT * FROM users WHERE id = :id');
+        $this->db->bind(':id', $userId);
+        return $this->db->single(); // Return single record for the logged-in user
+    }
+
+    // update password
+    public function updatePassword($userId, $hashedPassword)
+    {
+        // SQL to update the user's password
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
+
+        // Prepare the query
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':password', $hashedPassword);
+        $stmt->bindParam(':id', $userId);
+
+        // Execute the statement and return the result
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Product</title>
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/product_show.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -78,70 +81,73 @@
             imagesContainer.style.transform = `translateX(${offset}%)`; // Apply the sliding effect
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-        const carousel = document.querySelector('.carousel-images');
-        const images = carousel.querySelectorAll('img');
-        const thumbnails = document.querySelectorAll('.thumbnail-strip img');
-        const imageWidth = images[0].clientWidth;
-        let currentIndex = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.querySelector('.carousel-images');
+            const images = carousel.querySelectorAll('img');
+            const thumbnails = document.querySelectorAll('.thumbnail-strip img');
+            const imageWidth = images[0].clientWidth;
+            let currentIndex = 0;
 
-        // Function to update carousel and thumbnails
-        function updateCarousel() {
-            const offset = -currentIndex * imageWidth;
-            carousel.style.transform = `translateX(${offset}px)`;
+            // Function to update carousel and thumbnails
+            function updateCarousel() {
+                const offset = -currentIndex * imageWidth;
+                carousel.style.transform = `translateX(${offset}px)`;
 
-            // Update active thumbnail
+                // Update active thumbnail
+                thumbnails.forEach((thumbnail, index) => {
+                    thumbnail.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            // Thumbnail click event
             thumbnails.forEach((thumbnail, index) => {
-                thumbnail.classList.toggle('active', index === currentIndex);
+                thumbnail.addEventListener('click', () => {
+                    currentIndex = index; // Set currentIndex to clicked thumbnail
+                    updateCarousel();
+                });
             });
-        }
 
-        // Thumbnail click event
-        thumbnails.forEach((thumbnail, index) => {
-            thumbnail.addEventListener('click', () => {
-                currentIndex = index; // Set currentIndex to clicked thumbnail
+            // Carousel navigation
+            function moveCarousel(direction) {
+                currentIndex += direction;
+
+                // Wrap around logic
+                if (currentIndex < 0) {
+                    currentIndex = images.length - 1;
+                } else if (currentIndex >= images.length) {
+                    currentIndex = 0;
+                }
+
                 updateCarousel();
+            }
+
+            // Swipe logic for mobile devices
+            let startX = 0;
+            let endX = 0;
+
+            carousel.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
             });
-        });
 
-        // Carousel navigation
-        function moveCarousel(direction) {
-            currentIndex += direction;
+            carousel.addEventListener('touchend', function(e) {
+                endX = e.changedTouches[0].clientX;
 
-            // Wrap around logic
-            if (currentIndex < 0) {
-                currentIndex = images.length - 1;
-            } else if (currentIndex >= images.length) {
-                currentIndex = 0;
-            }
+                if (startX - endX > 50) {
+                    // Swipe left
+                    moveCarousel(1);
+                } else if (endX - startX > 50) {
+                    // Swipe right
+                    moveCarousel(-1);
+                }
+            });
 
+            // Initialize carousel
             updateCarousel();
-        }
-
-        // Swipe logic for mobile devices
-        let startX = 0;
-        let endX = 0;
-
-        carousel.addEventListener('touchstart', function (e) {
-            startX = e.touches[0].clientX;
         });
-
-        carousel.addEventListener('touchend', function (e) {
-            endX = e.changedTouches[0].clientX;
-
-            if (startX - endX > 50) {
-                // Swipe left
-                moveCarousel(1);
-            } else if (endX - startX > 50) {
-                // Swipe right
-                moveCarousel(-1);
-            }
-        });
-
-        // Initialize carousel
-        updateCarousel();
-    });
     </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

@@ -2,7 +2,8 @@ body {
     overflow-x: hidden;
     padding-top: 80px;
     /* Adjust this value to match the height of your navbar */
-    background-image: url(../images/background.jpg);
+    /* background-image: url(../images/background.jpg); */
+    background-color: aliceblue;
     background-size: cover;
 
 }
@@ -145,4 +146,7 @@ body {
     }
 
 
+}
+footer {
+    flex-shrink: 0;
 }

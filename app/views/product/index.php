@@ -48,10 +48,14 @@
                     </li>
                 <?php endif; ?>
 
-                <!-- Category and Home Links -->
-                <!-- <li class="nav-item">
-                    <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-info mr-2 mb-2"><i class="fas fa-home"></i> Home</a>
-                </li> -->
+                <!-- user profile -->
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                    <li class="nav-item">
+                        <form action="<?php echo URLROOT; ?>/UserController/index" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-dark mr-2 mb-2">Profile</button>
+                        </form>
+                    </li>
+                <?php endif; ?>
 
                 <!-- Order History Button -->
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
@@ -162,98 +166,187 @@
     </div>
 
     <!-- Product cards -->
-    <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4 mb-4">
-            <?php foreach ($data['products'] as $product):
-                if (isset($_GET['weightFilter'])) {
-                    if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
-                    if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
-                } ?>
-                <div class="col">
-                    <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="text-decoration-none">
-                        <div class="card h-100 shadow-lg border border-grey">
-                            <!-- Product Image -->
-                            <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
-                                alt="Product" class="card-img-top product-img">
+    <?php if (!isset($_SESSION['role']) || $_SESSION['role'] === 'customer'): ?>
 
-                            <!-- Limited Time Deal Badge -->
-                            <?php
-                            $discount = 0;
-                            if ($product->originalPrice > $product->sellingPrice) {
-                                $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
-                            }
-                            ?>
-                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                <?php if ($discount > 60): ?>
-                                    <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
+        <div class="container-fluid">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4 mb-4">
+                <?php foreach ($data['products'] as $product):
+                    if (isset($_GET['weightFilter'])) {
+                        if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
+                        if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
+                    } ?>
+                    <div class="col">
+                        <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="text-decoration-none">
+                            <div class="card h-100 shadow-lg border border-grey">
+                                <!-- Product Image -->
+                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
+                                    alt="Product" class="card-img-top product-img">
+
+                                <!-- Limited Time Deal Badge -->
+                                <?php
+                                $discount = 0;
+                                if ($product->originalPrice > $product->sellingPrice) {
+                                    $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
+                                }
+                                ?>
+                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                                    <?php if ($discount > 60): ?>
+                                        <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                            <?php endif; ?>
 
-                            <!-- Card Body -->
-                            <div class="card-body p-2">
-                                <!-- Product Name -->
-                                <h5 class="card-title text-dark mb-2 text-truncate" style="max-width: 100%"><?php echo htmlspecialchars($product->productName); ?></h5>
+                                <!-- Card Body -->
+                                <div class="card-body p-2">
+                                    <!-- Product Name -->
+                                    <h5 class="card-title text-dark mb-2 text-truncate" style="max-width: 100%"><?php echo htmlspecialchars($product->productName); ?></h5>
 
-                                <!-- Product Rating -->
-                                <div class="product-rating mb-2">
+                                    <!-- Product Rating -->
+                                    <div class="product-rating mb-2">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="star <?php echo $i <= $product->rating ? 'text-warning' : 'text-muted'; ?>">★</span>
+                                        <?php endfor; ?>
+                                        <span class="rating-count">
+                                            (<?php echo isset($product->reviewCount) ? htmlspecialchars($product->reviewCount) : '0'; ?>)
+                                        </span>
+                                    </div>
+
+                                    <!-- Product Price -->
+                                    <p class="card-text text-dark fw-bold">
+                                        ₹<?php echo number_format($product->sellingPrice); ?>
+                                    </p>
+
+                                    <!-- Original Price and Discount -->
+                                    <div class=" align-items-center">
+                                        <p class="text-muted">M.R.P: <span class="text-muted" style="text-decoration: line-through;">₹<?php echo number_format($product->originalPrice); ?></span>
+                                            <?php if ($discount > 0): ?>
+                                                <span class="badge text-danger">-<?php echo $discount . "% off"; ?></span>
+                                            <?php endif; ?>
+                                    </div>
+
+
+                                    <!-- Savings -->
+                                    <p class="text-success">Save ₹<?php echo number_format($product->originalPrice - $product->sellingPrice); ?> with coupon</p>
+
+                                    <!-- Estimated Delivery -->
+                                    <small class="text-muted">Get it by <strong>Monday, December 9</strong></small>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="card-footer text-center">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
+                                        <!-- "View Product" Button -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                                            <button class="btn btn-outline-primary btn-sm m-2 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
+                                        <?php endif; ?>
+                                        <!-- Admin Actions -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                                            <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
+                                            <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
+                                        <?php endif; ?>
+
+                                        <!-- Customer Add-to-Cart Button -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                                            <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
+                                                <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
+                                                <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto mt-2 mb-2">Cart</button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+        <div class="container-fluid mt-4 mb-4">
+            <table class="table table-bordered table-hover shadow-lg text-center align-middle">
+                <thead class="bg-dark text-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Rating</th>
+                        <th>Selling Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($data['products'] as $product):
+                        if (isset($_GET['weightFilter'])) {
+                            if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
+                            if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
+                        }
+
+                        // Calculate discount
+                        $discount = 0;
+                        if ($product->originalPrice > $product->sellingPrice) {
+                            $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
+                        }
+                    ?>
+                        <tr>
+                            <!-- Product Image -->
+                            <td>
+                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo $product->image_name ? htmlspecialchars($product->image_name) : 'placeholder.jpg'; ?>"
+                                    alt="Product" class="img-thumbnail" style="width: 100px; height: auto;">
+                            </td>
+
+                            <!-- Product Name -->
+                            <td><?php echo htmlspecialchars($product->productName); ?></td>
+
+                            <!-- Product Rating -->
+                            <td>
+                                <div class="product-rating">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <span class="star <?php echo $i <= $product->rating ? 'text-warning' : 'text-muted'; ?>">★</span>
                                     <?php endfor; ?>
-                                    <span class="rating-count">
-                                        (<?php echo isset($product->reviewCount) ? htmlspecialchars($product->reviewCount) : '0'; ?>)
-                                    </span>
+                                    <small>(<?php echo isset($product->reviewCount) ? htmlspecialchars($product->reviewCount) : '0'; ?>)</small>
                                 </div>
+                            </td>
 
-                                <!-- Product Price -->
-                                <p class="card-text text-dark fw-bold">
-                                    ₹<?php echo number_format($product->sellingPrice); ?>
-                                </p>
+                            <!-- Selling Price -->
+                            <td>₹<?php echo number_format($product->sellingPrice); ?></td>
 
-                                <!-- Original Price and Discount -->
-                                <div class=" align-items-center">
-                                    <p class="text-muted">M.R.P: <span class="text-muted" style="text-decoration: line-through;">₹<?php echo number_format($product->originalPrice); ?></span>
-                                        <?php if ($discount > 0): ?>
-                                            <span class="badge text-danger">-<?php echo $discount . "% off"; ?></span>
-                                        <?php endif; ?>
-                                </div>
-
-
-                                <!-- Savings -->
-                                <p class="text-success">Save ₹<?php echo number_format($product->originalPrice - $product->sellingPrice); ?> with coupon</p>
-
-                                <!-- Estimated Delivery -->
-                                <small class="text-muted">Get it by <strong>Monday, December 9</strong></small>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="card-footer text-center">
-                                <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
+                            <!-- Actions -->
+                            <td>
+                                <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
                                     <!-- "View Product" Button -->
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                        <button class="btn btn-outline-primary btn-sm m-2 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
+                                        <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
                                     <?php endif; ?>
+
                                     <!-- Admin Actions -->
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
-                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
+                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>"
+                                            onclick="return confirm('Are you sure you want to delete this product?');"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
                                     <?php endif; ?>
 
                                     <!-- Customer Add-to-Cart Button -->
                                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                        <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
+                                        <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block">
                                             <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
-                                            <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto mt-2 mb-2">Cart</button>
+                                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-cart-plus"></i> Cart</button>
                                         </form>
                                     <?php endif; ?>
                                 </div>
-                            </div>
-
-                        </div>
-                    </a>
-                </div>
-            <?php endforeach; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
-    </div>
+    <?php endif; ?>
 
     <style>
         /* Product Image Styling */

@@ -119,6 +119,71 @@ span {
     /* Ensures the image is cropped properly */
 }
 
+/* Modal Background */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    /* Transparent background */
+    display: none;
+    /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    cursor: pointer;
+}
+/* Adjust the image grid layout */
+.existing-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Image styles */
+.existing-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.remove-btn {
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+
+.image-modal .modal-content {
+    filter: none;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .file-input-container {

@@ -198,7 +198,28 @@ class Products extends Controller
             Helper::redirect(URLROOT . "/products");
         }
 
+        // Check if the request method is POST
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Handle image removal
+            if (isset($_POST['imageId'])) {
+                $imageId = $_POST['imageId'];
+                // Call a method in your model to remove the image from the database
+                $imageName = $this->productModel->getImageNameById($imageId); // Fetch the image name
+                if ($imageName) {
+                    // Delete the image file from the folder
+                    $imagePath = getcwd() . "/images/" . $imageName;
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath); // Delete the file from the server
+                    }
+                }
+
+                // Now remove the image record from the database
+                $this->productModel->removeProductImage($imageId);
+                Helper::flashMessage('Image removed successfully.');
+                Helper::redirect(URLROOT . "/products/edit/$id");
+            }
+
+            // Otherwise, handle product updates (if no image removal)
             $_PRODUCT = filter_input_array(INPUT_POST);
             $data = ['id' => $id];
             foreach (Helper::getProductFields() as $field) {
@@ -208,7 +229,7 @@ class Products extends Controller
             // Update product details in the database
             $this->productModel->edit($data);
 
-            // Check if images are uploaded
+            // Handle image uploads (if any)
             if (isset($_FILES['productImage']) && $_FILES['productImage']['error'][0] == 0) {
                 $fileCount = count($_FILES['productImage']['name']);
                 $uploadDir = getcwd() . "/images/";
@@ -247,9 +268,6 @@ class Products extends Controller
 
                 // Flash success message if images were uploaded successfully
                 Helper::flashMessage('Images uploaded and saved successfully.');
-            } else {
-                // Handle no image uploaded
-                Helper::flashMessage('No images were uploaded. Please try again.', 'error');
             }
 
             // Redirect back to products page
@@ -257,12 +275,19 @@ class Products extends Controller
         } else {
             $product = $this->productModel->getProductById($id);
             $categories = $this->categoryModel->getAllCategories();
+            $images = $this->productModel->getProductImages($id); // Fetch existing images
 
             if ($product) {
-                $data = ['id' => $id, 'categories' => $categories];
+                $data = [
+                    'id' => $id,
+                    'categories' => $categories,
+                    'images' => $images, // Pass images to the view
+                ];
+
                 foreach (Helper::getProductFields() as $field) {
                     $data[$field] = $product->$field ?? '';
                 }
+
                 $this->view('product/edit', $data);
             } else {
                 Helper::flashMessage('Product not found.', 'error');
@@ -270,6 +295,8 @@ class Products extends Controller
             }
         }
     }
+
+
 
 
     public function delete($id)

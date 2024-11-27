@@ -34,7 +34,7 @@
                 <a href="<?php echo URLROOT; ?>/products" class="btn btn-primary m-1">
                     <i class="fas fa-boxes"></i> Go to Products
                 </a>
-                <a href="<?php echo URLROOT; ?>/choose/options" class="btn btn-secondary m-1">
+                <a href="<?php echo URLROOT; ?>/products" class="btn btn-secondary m-1">
                     <i class="fas fa-home"></i> Home
                 </a>
             </div>

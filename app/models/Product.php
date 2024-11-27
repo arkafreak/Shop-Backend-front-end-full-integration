@@ -167,4 +167,54 @@ class Product
         $this->db->bind(':query', '%' . $query . '%');
         return $this->db->resultSet();
     }
+
+    public function getProductImages($productId)
+    {
+        $this->db->query("SELECT * FROM Product_images WHERE product_id = :productId");
+        $this->db->bind(':productId', $productId);
+        return $this->db->resultSet();
+    }
+
+    public function removeProductImage($imageId)
+    {
+        // Step 1: Fetch the image name from the database before deleting the record
+        $this->db->query('SELECT image_name FROM Product_images WHERE id = :imageId');
+        $this->db->bind(':imageId', $imageId);
+        $image = $this->db->single();
+
+        // Check if the image exists in the database
+        if ($image) {
+            $imageName = $image->image_name;
+
+            // Step 2: Delete the image file from the server
+            $imagePath = getcwd() . "/images/" . $imageName;
+            if (file_exists($imagePath)) {
+                unlink($imagePath); // Delete the file from the server
+            }
+
+            // Step 3: Delete the image record from the database
+            $this->db->query('DELETE FROM Product_images WHERE id = :imageId');
+            $this->db->bind(':imageId', $imageId);
+
+            return $this->db->execute();
+        }
+
+        return false;
+    }
+
+    public function getImageNameById($imageId)
+    {
+        // Prepare the SQL query to get the image name from the database
+        $query = "SELECT image_name FROM Product_images WHERE id = :imageId";
+
+        // Execute the query
+        $this->db->query($query);
+        $this->db->bind(':imageId', $imageId);
+
+        // Fetch the result
+        $result = $this->db->single();
+
+        // Return the image name if found, or null if not
+        return $result ? $result->image_name : null;
+    }
 }
