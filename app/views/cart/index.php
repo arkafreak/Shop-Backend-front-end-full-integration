@@ -55,21 +55,16 @@
 
                                 <!-- Quantity Actions -->
                                 <div class="d-flex">
-                                    <!-- Decrease Quantity -->
                                     <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
                                         <input type="hidden" name="action" value="decrease">
                                         <button type="submit" class="btn btn-outline-primary btn-sm">-</button>
                                     </form>
-
-                                    <!-- Increase Quantity -->
                                     <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
                                         <input type="hidden" name="action" value="increase">
                                         <button type="submit" class="btn btn-outline-primary btn-sm">+</button>
                                     </form>
-
-                                    <!-- Remove Item -->
                                     <form action="<?php echo URLROOT; ?>/CartController/removeItem" method="POST">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
                                         <button type="submit" class="btn btn-danger btn-sm">Remove</button>
@@ -87,7 +82,10 @@
 
                     <!-- Place Order Button -->
                     <form action="<?php echo URLROOT; ?>/OrderController/addressPayment" method="POST">
-                        <button type="submit" class="btn btn-success w-100 mb-3">Place Order</button>
+                        <button type="submit" class="btn btn-success w-100 mb-3" 
+                                <?php echo empty($data['stockIssues']) ? '' : 'disabled'; ?>>
+                            Place Order
+                        </button>
                     </form>
 
                     <!-- Back to Products Button -->
@@ -103,6 +101,24 @@
         </div>
     </div>
 
+    <!-- Stock Warning Modal -->
+    <div class="modal fade" id="stockWarningModal" tabindex="-1" aria-labelledby="stockWarningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="stockWarningModalLabel">Stock Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="stockWarnings" class="list-unstyled"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-dark text-white py-3 mt-5">
         <div class="container text-center">
@@ -111,9 +127,30 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS (Optional) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stockIssues = <?php echo json_encode($data['stockIssues']); ?>;
 
+            if (stockIssues.length > 0) {
+                const stockWarnings = document.getElementById('stockWarnings');
+
+                stockIssues.forEach(issue => {
+                    const warningItem = document.createElement('li');
+                    warningItem.innerHTML = `
+                        <strong>${issue.productName}</strong>: 
+                        Available Stock: ${issue.availableStock}, 
+                        Requested: ${issue.requestedQuantity}
+                    `;
+                    stockWarnings.appendChild(warningItem);
+                });
+
+                const stockWarningModal = new bootstrap.Modal(document.getElementById('stockWarningModal'));
+                stockWarningModal.show();
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -9,6 +9,8 @@ class OrderController extends Controller
     private $stripeServices;
     private $orderHistoryModel;
 
+    private $productModel;
+
     public function __construct()
     {
         // Ensure the user is logged in
@@ -20,6 +22,7 @@ class OrderController extends Controller
         $this->orderModel = $this->model('OrderModel');
         $this->cartModel = $this->model('CartModel');
         $this->orderHistoryModel = $this->model('OrderHistoryModel');
+        $this->productModel = $this->model('Product');
         // Instantiate MailController
         $this->mailController = new MailController();
         $this->stripeServices = new StripeService();
@@ -97,6 +100,7 @@ class OrderController extends Controller
 
         $userId = $_SESSION['user_id'];
 
+        // Retrieve cart items
         $cartItems = $this->cartModel->getCartItems($userId);
         $selectedItems = [];
 
@@ -118,9 +122,12 @@ class OrderController extends Controller
         // Update the order status to 'completed'
         $this->orderModel->updateOrderStatus($orderId, 'completed');
 
-        //adding order items for showing in the admin dashboard
+        // Add order items for showing in the admin dashboard
         foreach ($cartItems as $item) {
             $this->orderModel->addOrderItem($orderId, $item->id, $item->quantity);
+
+            // Update stock for the purchased products
+            $this->productModel->reduceStock($item->id, $item->quantity);
         }
 
         // Clear the cart after successful order
@@ -132,11 +139,11 @@ class OrderController extends Controller
         $username = $userModel->getUserNameById($userId);
 
         // Send email notification
-
         $this->mailController->sendTransactionEmail($userEmail, $username, $orderId, $totalAmount, $paymentMethod, $selectedItems);
 
         $this->view('order/success');
     }
+
 
     public function purchaseHistory()
     {
@@ -151,11 +158,19 @@ class OrderController extends Controller
         // Fetch purchased products for the user
         $purchasedProducts = $this->orderHistoryModel->getPurchasedProductsByUser($userId);
 
-        // Pass data to the view
-        $data = [
-            'products' => $purchasedProducts,
-        ];
+        // Check if products are found, if not, send a message
+        if ($purchasedProducts) {
+            $data = [
+                'products' => $purchasedProducts,
+            ];
+        } else {
+            $data = [
+                'products' => [],
+                'message' => 'You have no purchase history.',
+            ];
+        }
 
+        // Pass data to the view
         $this->view('order_history/order_history', $data);
     }
 

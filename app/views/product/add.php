@@ -39,10 +39,14 @@
                     <input type="decimal" name="weight" id="weight" required>
                     <span class="hint">Enter "0" for Digital products</span>
                 </div>
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stocks:</label>
+                    <input type="number" id="stock" name="stock" class="form-control" value="<?php echo htmlspecialchars($data['stock']); ?>" min="0" required>
+                </div>
                 <div class="full-width">
                     <label for="categoryId">Category:</label>
                     <select name="categoryId" id="categoryId" required>
-                    <option value="">--Select Category--</option>
+                        <option value="">--Select Category--</option>
                         <?php foreach ($data['categories'] as $category): ?>
                             <option value="<?php echo htmlspecialchars($category->id); ?>"
                                 <?php echo (isset($data['categoryId']) && $data['categoryId'] == $category->id) ? 'selected' : ''; ?>>

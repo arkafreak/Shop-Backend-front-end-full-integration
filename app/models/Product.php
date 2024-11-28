@@ -217,4 +217,37 @@ class Product
         // Return the image name if found, or null if not
         return $result ? $result->image_name : null;
     }
+
+    public function getImagesByProductId($productId)
+    {
+        // SQL query to select all images associated with the given product_id
+        $sql = "SELECT * FROM Product_images WHERE product_id = :product_id";
+
+        // Prepare the query
+        $stmt = $this->db->prepare($sql);
+
+        // Bind the product_id parameter to the query
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+
+        // Execute the query
+        $stmt->execute();
+
+        // Fetch the results
+        $images = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        // Return the images array or false if no images found
+        return $images ? $images : false;
+    }
+
+    public function reduceStock($productId, $quantity)
+    {
+        $sql = "UPDATE products SET stock = stock - :quantity WHERE id = :productId AND stock >= :quantity";
+        $this->db->query($sql);
+        $this->db->bind(':quantity', $quantity);
+        $this->db->bind(':productId', $productId);
+
+        if (!$this->db->execute()) {
+            throw new Exception("Failed to update stock for product ID: $productId");
+        }
+    }
 }

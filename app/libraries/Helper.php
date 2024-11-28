@@ -74,7 +74,7 @@ class Helper
     //function for storing all the column names in an array
     public static function getProductFields()
     {
-        return ['productName', 'brand', 'originalPrice', 'sellingPrice', 'weight', 'categoryId'];
+        return ['productName', 'brand', 'originalPrice', 'sellingPrice', 'weight', 'categoryId', 'stock'];
     }
 
     //function for storing all the column names in an array for the usercontroller

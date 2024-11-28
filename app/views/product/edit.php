@@ -52,6 +52,11 @@
             </div>
 
             <div class="mb-3">
+                <label for="stock" class="form-label">Stocks:</label>
+                <input type="number" id="stock" name="stock" class="form-control" value="<?php echo htmlspecialchars($data['stock']); ?>" min="0" required>
+            </div>
+
+            <div class="mb-3">
                 <label for="categoryId" class="form-label">Category:</label>
                 <select name="categoryId" id="categoryId" class="form-select" required>
                     <?php foreach ($data['categories'] as $category): ?>

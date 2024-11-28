@@ -176,4 +176,27 @@ class CartModel
         // Debugging: Print the result to check the structure
         return $result;
     }
+
+    public function getCartItemsWithDetails($userId)
+    {
+        $query = "SELECT 
+                  p.id, 
+                  p.productName, 
+                  p.brand, 
+                  p.sellingPrice, 
+                  c.quantity, 
+                  p.stock, 
+                  (SELECT image_name 
+                   FROM Product_images 
+                   WHERE product_id = p.id 
+                   LIMIT 1) as image_name
+              FROM cart c
+              JOIN products p ON c.productId = p.id
+              WHERE c.userId = :userId";
+
+        $this->db->query($query);
+        $this->db->bind(':userId', $userId);
+
+        return $this->db->resultSet(); // Fetch all results
+    }
 }

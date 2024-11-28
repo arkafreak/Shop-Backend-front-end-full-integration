@@ -204,7 +204,7 @@ class Products extends Controller
             if (isset($_POST['imageId'])) {
                 $imageId = $_POST['imageId'];
                 // Call a method in your model to remove the image from the database
-                $imageName = $this->productModel->getImageNameById($imageId); // Fetch the image name
+                $imageName = $this->productModel->getImagesByProductId($imageId); // Fetch the image name
                 if ($imageName) {
                     // Delete the image file from the folder
                     $imagePath = getcwd() . "/images/" . $imageName;
@@ -306,28 +306,52 @@ class Products extends Controller
             Helper::redirect(URLROOT . "/products");
         }
 
-        // Retrieve the image name from the Product_images table
-        $productImage = $this->productModel->getProductImageByProductId($id);
+        // Retrieve all images associated with the product
+        $productImages = $this->productModel->getImagesByProductId($id); // Updated to get images by product ID
 
         // Check if the product has associated images
-        if ($productImage && isset($productImage->image_name)) { // Use object notation
-            $imagePath = getcwd() . "/images/" . $productImage->image_name; // Path to the image file
+        if ($productImages) {
+            // Flag to check if all images were deleted successfully
+            $imagesDeletedSuccessfully = true;
 
-            // Check if the image exists and delete it
-            if (file_exists($imagePath)) {
-                unlink($imagePath); // Delete the image file
-            } else {
-                Helper::flashMessage('Image file not found, but product deleted successfully.', 'error');
+            // Loop through all associated images
+            foreach ($productImages as $image) {
+                $imagePath = getcwd() . "/images/" . $image->image_name; // Path to the image file
+
+                // Check if the image exists and delete it
+                if (file_exists($imagePath)) {
+                    if (!unlink($imagePath)) {
+                        $imagesDeletedSuccessfully = false;
+                    }
+                } else {
+                    // Log an error if the image file does not exist
+                    $imagesDeletedSuccessfully = false;
+                }
+
+                // Remove the image record from the database
+                $this->productModel->removeProductImage($image->id); // Assuming image has an 'id' field for deletion
             }
+
+            // Provide feedback to the admin about image deletion status
+            if ($imagesDeletedSuccessfully) {
+                Helper::flashMessage('All associated images deleted successfully.', 'success');
+            } else {
+                Helper::flashMessage('One or more images could not be deleted.', 'error');
+            }
+        } else {
+            // If no images were found, still proceed with deleting the product
+            Helper::flashMessage('No images found for this product.', 'info');
         }
 
-        // Delete the product from the database (this will also delete associated image records due to cascade delete)
+        // Delete the product from the database (this will also delete associated image records if using cascade delete)
         $this->productModel->delete($id);
 
         // Flash success message and redirect
-        Helper::flashMessage('Product deleted successfully.');
+        Helper::flashMessage('Product and associated images deleted successfully.');
         Helper::redirect(URLROOT . '/products');
     }
+
+
 
     // Search product part
     public function search()

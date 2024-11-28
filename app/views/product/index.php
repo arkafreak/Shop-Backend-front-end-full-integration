@@ -165,7 +165,7 @@
         ?>
     </div>
 
-    <!-- Product cards -->
+    <!-- Product cards for customer view -->
     <?php if (!isset($_SESSION['role']) || $_SESSION['role'] === 'customer'): ?>
 
         <div class="container-fluid">
@@ -189,16 +189,25 @@
                                     $discount = round((($product->originalPrice - $product->sellingPrice) / $product->originalPrice) * 100);
                                 }
                                 ?>
-                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                    <?php if ($discount > 60): ?>
-                                        <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
-                                    <?php endif; ?>
+                                <?php if ($discount > 60): ?>
+                                    <div class="badge bg-danger position-absolute top-0 start-0 m-2 text-white">Limited Time Deal</div>
                                 <?php endif; ?>
 
                                 <!-- Card Body -->
                                 <div class="card-body p-2">
                                     <!-- Product Name -->
                                     <h5 class="card-title text-dark mb-2 text-truncate" style="max-width: 100%"><?php echo htmlspecialchars($product->productName); ?></h5>
+
+                                    <!-- Product Stock Status -->
+                                    <p class="text-danger fw-bold">
+                                        <?php if ($product->stock == 0): ?>
+                                            Out of Stock
+                                        <?php elseif ($product->stock < 6): ?>
+                                            Only <?php echo $product->stock; ?> left
+                                        <?php elseif ($product->stock < 10): ?>
+                                            Only a Few Left
+                                        <?php endif; ?>
+                                    </p>
 
                                     <!-- Product Rating -->
                                     <div class="product-rating mb-2">
@@ -221,8 +230,8 @@
                                             <?php if ($discount > 0): ?>
                                                 <span class="badge text-danger">-<?php echo $discount . "% off"; ?></span>
                                             <?php endif; ?>
+                                        </p>
                                     </div>
-
 
                                     <!-- Savings -->
                                     <p class="text-success">Save ₹<?php echo number_format($product->originalPrice - $product->sellingPrice); ?> with coupon</p>
@@ -238,18 +247,15 @@
                                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                                             <button class="btn btn-outline-primary btn-sm m-2 me-sm-2 w-100 w-sm-auto"><i class="fas fa-eye"></i> View</button>
                                         <?php endif; ?>
-                                        <!-- Admin Actions -->
-                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                            <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-edit"></i>Edit</a>
-                                            <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>" onclick="return confirm('Are you sure you want to delete this product?');" class="btn btn-danger btn-sm m-2 mb-sm-0 me-sm-2 w-100 w-sm-auto"><i class="fas fa-trash"></i>Delete</a>
-                                        <?php endif; ?>
 
                                         <!-- Customer Add-to-Cart Button -->
-                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer' && $product->stock > 0): ?>
                                             <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block w-100 w-sm-auto">
                                                 <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
                                                 <button type="submit" class="btn btn-success btn-sm w-100 w-sm-auto mt-2 mb-2">Cart</button>
                                             </form>
+                                        <?php elseif ($product->stock == 0): ?>
+                                            <button class="btn btn-secondary btn-sm w-100 w-sm-auto mt-2 mb-2" disabled>Out of Stock</button>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -260,6 +266,7 @@
                 <?php endforeach; ?>
             </div>
         </div>
+
     <?php endif; ?>
 
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
@@ -271,6 +278,7 @@
                         <th>Product Name</th>
                         <th>Rating</th>
                         <th>Selling Price</th>
+                        <th>Stock</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -309,6 +317,9 @@
 
                             <!-- Selling Price -->
                             <td>₹<?php echo number_format($product->sellingPrice); ?></td>
+
+                            <!-- Stock sections -->
+                            <td><?php echo htmlspecialchars($product->stock); ?></td>
 
                             <!-- Actions -->
                             <td>
