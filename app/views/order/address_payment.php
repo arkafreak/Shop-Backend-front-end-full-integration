@@ -124,7 +124,7 @@
 
         <!-- Back to Cart Button -->
         <form action="<?php echo URLROOT; ?>/CartController" method="POST" class="text-center">
-            <button type="submit" class="btn btn-outline-primary btn-lg w-100">Go Back to Cart</button>
+            <button type="submit" class="btn btn-dark btn-lg w-20">Go Back to Cart</button>
         </form>
     </div>
 
