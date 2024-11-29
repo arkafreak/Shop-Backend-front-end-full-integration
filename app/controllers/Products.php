@@ -22,27 +22,48 @@ class Products extends Controller
     public function index()
     {
         // Retrieve userId from session
-        $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+        $userId = $_SESSION['user_id'] ?? null;
+        $role = $_SESSION['role'] ?? null;  // Get the user's role
 
-        // Retrieve all products
-        $products = $this->productModel->getAllProductsWithImages();
-
-        // Get the cart item count for the user if logged in
+        // Initialize cart item count
         $cartItemCount = 0;
         if ($userId) {
             $cartItemCount = $this->cartModel->count($userId);
-            $cartItemCount = isset($cartItemCount[0]->count) ? $cartItemCount[0]->count : 0;
+            $cartItemCount = isset($cartItemCount->count) ? (int)$cartItemCount->count : 0;
+        }
+
+        // Retrieve products based on user role
+        if ($role === 'admin') {
+            // Admin can view all products, including withheld ones
+            $products = $this->productModel->getAllProductsWithImages();
+        } else {
+            // Customers cannot see withheld products
+            $products = $this->productModel->getAllProductsWithImages(['isWithheld' => 0]);
+        }
+
+        // Add isInCart property for each product
+        if ($userId) {
+            foreach ($products as $product) {
+                $product->isInCart = $this->cartModel->isProductInCart($product->id, $userId);
+            }
+        } else {
+            foreach ($products as $product) {
+                $product->isInCart = false; // Default to false if the user is not logged in
+            }
         }
 
         // Prepare data to pass to the view
         $data = [
             'products' => $products,
-            'cartItemCount' => $cartItemCount
+            'cartItemCount' => $cartItemCount,
         ];
 
         // Load the view
         $this->view('product/index', $data);
     }
+
+
+
 
 
 
@@ -306,6 +327,12 @@ class Products extends Controller
             Helper::redirect(URLROOT . "/products");
         }
 
+        // Check if the product is in any cart
+        if ($this->cartModel->isProductInCart($id)) { // Assuming isProductInCart method exists in CartModel
+            Helper::flashMessage('This product cannot be deleted as it is currently in a cart.', 'error');
+            Helper::redirect(URLROOT . "/products");
+        }
+
         // Retrieve all images associated with the product
         $productImages = $this->productModel->getImagesByProductId($id); // Updated to get images by product ID
 
@@ -343,13 +370,14 @@ class Products extends Controller
             Helper::flashMessage('No images found for this product.', 'info');
         }
 
-        // Delete the product from the database (this will also delete associated image records if using cascade delete)
+        // Delete the product from the database
         $this->productModel->delete($id);
 
         // Flash success message and redirect
-        Helper::flashMessage('Product and associated images deleted successfully.');
+        Helper::flashMessage('Product and associated images deleted successfully.', 'success');
         Helper::redirect(URLROOT . '/products');
     }
+
 
 
 
@@ -364,5 +392,33 @@ class Products extends Controller
         } else {
             $this->index(); // Load all products if no query
         }
+    }
+
+
+    //withheld part
+    public function toggleWithhold($productId)
+    {
+        // Check if the user is an admin
+        if (!Helper::isAdmin()) {
+            Helper::redirect(URLROOT . "/products");
+        }
+
+        // Get current product status
+        $product = $this->productModel->getProductById($productId);
+
+        if ($product) {
+            // Toggle the isWithheld status
+            $newStatus = !$product->isWithheld;
+            $this->productModel->toggleWithholdStatus($productId, $newStatus);
+
+            // Flash message based on action
+            $action = $newStatus ? 'Withheld' : 'Published';
+            Helper::flashMessage("Product has been successfully {$action}.", 'success');
+        } else {
+            Helper::flashMessage("Product not found.", 'error');
+        }
+
+        // Redirect back to the product list
+        Helper::redirect(URLROOT . "/products");
     }
 }

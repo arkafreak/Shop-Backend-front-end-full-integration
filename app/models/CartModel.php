@@ -133,15 +133,15 @@ class CartModel
         }, $result);
     }
 
-    public function isProductInCart($userId, $productId)
-    {
-        // Query to check if the product is already in the user's cart
-        $this->db->query("SELECT COUNT(*) FROM cart WHERE userId = :userId AND productId = :productId");
-        $this->db->bind(':userId', $userId);
-        $this->db->bind(':productId', $productId);
+    // public function isProductInCart($userId, $productId)
+    // {
+    //     // Query to check if the product is already in the user's cart
+    //     $this->db->query("SELECT COUNT(*) FROM cart WHERE userId = :userId AND productId = :productId");
+    //     $this->db->bind(':userId', $userId);
+    //     $this->db->bind(':productId', $productId);
 
-        return $this->db->fetchColumn() > 0; // Return true if product is in cart
-    }
+    //     return $this->db->fetchColumn() > 0; // Return true if product is in cart
+    // }
 
 
     //new function for getting cart items along with images
@@ -168,14 +168,18 @@ class CartModel
 
     public function count($userId)
     {
-        $query = "SELECT count(*) as count FROM cart WHERE userId = :userId";  // Alias count as count
+        $query = "SELECT COUNT(*) as count FROM cart WHERE userId = :userId";
         $this->db->query($query);
         $this->db->bind(':userId', $userId);
-        $result = $this->db->resultSet(); // Fetch all results
 
-        // Debugging: Print the result to check the structure
+        $result = $this->db->single();  // Fetch a single result
+
+        // Debugging: Output the result
+        // var_dump($result);  // This will help you inspect the returned object
+
         return $result;
     }
+
 
     public function getCartItemsWithDetails($userId)
     {
@@ -198,5 +202,28 @@ class CartModel
         $this->db->bind(':userId', $userId);
 
         return $this->db->resultSet(); // Fetch all results
+    }
+
+    public function isProductInCart($productId)
+    {
+        $query = "SELECT COUNT(*) as count FROM cart WHERE productId = :productId";
+        $this->db->query($query);
+        $this->db->bind(':productId', $productId);
+        $result = $this->db->single();
+
+        // Access the property as an object
+        return $result->count > 0;
+    }
+
+    public function isProductInCartt($productId, $userId)
+    {
+        $query = "SELECT COUNT(*) as count 
+              FROM cart 
+              WHERE productId = :productId AND userId = :userId";
+        $this->db->query($query);
+        $this->db->bind(':productId', $productId);
+        $this->db->bind(':userId', $userId);
+        $result = $this->db->single();
+        return $result->count > 0; // Returns true if count > 0, otherwise false
     }
 }

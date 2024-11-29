@@ -60,20 +60,42 @@
                                         <input type="hidden" name="action" value="decrease">
                                         <button type="submit" class="btn btn-outline-primary btn-sm">-</button>
                                     </form>
+
+                                    <!-- Check stock and disable "+" button if necessary -->
+                                    <?php
+                                    $disablePlus = ''; // By default, allow the increase button
+                                    $stockMessage = ''; // No stock message by default
+                                    if ($item->quantity >= $item->stock) {
+                                        $disablePlus = 'disabled'; // Disable the plus button if quantity is equal to stock
+                                        $stockMessage = "Only {$item->stock} in stock"; // Show stock message
+                                    }
+                                    ?>
                                     <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
                                         <input type="hidden" name="action" value="increase">
-                                        <button type="submit" class="btn btn-outline-primary btn-sm">+</button>
+                                        <button type="submit" class="btn btn-outline-primary btn-sm" <?php echo $disablePlus; ?>>+</button>
                                     </form>
+
                                     <form action="<?php echo URLROOT; ?>/CartController/removeItem" method="POST">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
                                         <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                                     </form>
                                 </div>
+
+                                <!-- Stock Message -->
+                                <?php if (!empty($stockMessage)): ?>
+                                    <p class=" txt text-warning mt-2"><?php echo $stockMessage; ?></p>
+                                    <style>
+                                        .txt{
+                                            color: orangered !important;
+                                        }
+                                    </style>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
+
 
                 <!-- Cart Summary -->
                 <div class="cart-summary p-3 bg-white rounded shadow-sm border">
@@ -82,8 +104,8 @@
 
                     <!-- Place Order Button -->
                     <form action="<?php echo URLROOT; ?>/OrderController/addressPayment" method="POST">
-                        <button type="submit" class="btn btn-success w-100 mb-3" 
-                                <?php echo empty($data['stockIssues']) ? '' : 'disabled'; ?>>
+                        <button type="submit" class="btn btn-success w-100 mb-3"
+                            <?php echo empty($data['stockIssues']) ? '' : 'disabled'; ?>>
                             Place Order
                         </button>
                     </form>
@@ -130,7 +152,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const stockIssues = <?php echo json_encode($data['stockIssues']); ?>;
 
             if (stockIssues.length > 0) {

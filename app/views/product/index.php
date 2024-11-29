@@ -171,10 +171,17 @@
         <div class="container-fluid">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 mt-4 mb-4">
                 <?php foreach ($data['products'] as $product):
+                    // Skip product if it is withheld (isWithheld = 1)
+                    if ($product->isWithheld == 1) {
+                        continue; // Skip this product if it is withheld
+                    }
+
+                    // Additional weight filter logic
                     if (isset($_GET['weightFilter'])) {
                         if ($_GET['weightFilter'] === 'zero' && $product->weight != 0) continue;
                         if ($_GET['weightFilter'] === 'nonZero' && $product->weight <= 0) continue;
-                    } ?>
+                    }
+                ?>
                     <div class="col">
                         <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="text-decoration-none">
                             <div class="card h-100 shadow-lg border border-grey">
@@ -269,6 +276,7 @@
 
     <?php endif; ?>
 
+
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
         <div class="container-fluid mt-4 mb-4">
             <table class="table table-bordered table-hover shadow-lg text-center align-middle">
@@ -324,40 +332,44 @@
                             <!-- Actions -->
                             <td>
                                 <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
-                                    <!-- "View Product" Button -->
-                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                        <a href="<?php echo URLROOT; ?>/products/show/<?php echo $product->id; ?>" class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                    <?php endif; ?>
-
-                                    <!-- Admin Actions -->
-                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm">
+                                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                                        <!-- Edit Button -->
+                                        <a href="<?php echo URLROOT; ?>/products/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm mr-2">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
-                                        <a href="<?php echo URLROOT; ?>/products/delete/<?php echo $product->id; ?>"
-                                            onclick="return confirm('Are you sure you want to delete this product?');"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
-                                    <?php endif; ?>
 
-                                    <!-- Customer Add-to-Cart Button -->
-                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
-                                        <form action="<?php echo URLROOT; ?>/CartController/addToCart" method="POST" class="d-inline-block">
-                                            <input type="hidden" name="productId" value="<?php echo $product->id; ?>">
-                                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-cart-plus"></i> Cart</button>
-                                        </form>
+                                        <?php if (!empty($product->isInCart)): ?>
+                                            <!-- Can't Withhold Option (If in Cart) -->
+                                            <button class="btn btn-secondary btn-sm disabled" style="background-color: #ccc; color: #808080;">
+                                                <i class="fas fa-ban"></i> Can't Withhold (In Cart)
+                                            </button>
+                                        <?php elseif ($product->isWithheld): ?>
+                                            <!-- Publish Option (If Withheld) -->
+                                            <a href="<?php echo URLROOT; ?>/products/toggleWithhold/<?php echo $product->id; ?>"
+                                                class="btn btn-success btn-sm"
+                                                style="background-color: #28a745; color: #fff; border-color: #bbb;">
+                                                <i class="fas fa-eye"></i> Publish Product
+                                            </a>
+                                        <?php else: ?>
+                                            <!-- Withhold Option (If Not in Cart and Not Withheld) -->
+                                            <a href="<?php echo URLROOT; ?>/products/toggleWithhold/<?php echo $product->id; ?>"
+                                                class="btn btn-danger btn-sm"
+                                                style="background-color: #dc3545; color: #fff; border-color: #bbb;">
+                                                <i class="fas fa-eye-slash"></i> Withhold Product
+                                            </a>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
                             </td>
+
+
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     <?php endif; ?>
+
 
     <style>
         /* Product Image Styling */

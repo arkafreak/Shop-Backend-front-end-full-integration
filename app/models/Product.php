@@ -250,4 +250,13 @@ class Product
             throw new Exception("Failed to update stock for product ID: $productId");
         }
     }
+
+    public function toggleWithholdStatus($productId, $status)
+    {
+        $query = "UPDATE products SET isWithheld = :status WHERE id = :productId";
+        $this->db->query($query);
+        $this->db->bind(':status', $status);
+        $this->db->bind(':productId', $productId);
+        return $this->db->execute();
+    }
 }
