@@ -48,6 +48,43 @@
                     </li>
                 <?php endif; ?>
 
+                <!-- Notification Bell -->
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                    <!-- Notification Bell -->
+                    <li class="nav-item dropdown position-relative">
+                        <a href="#" class="nav-link text-white" id="notificationBell" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <!-- Red dot (hidden by default) -->
+                            <span id="notificationDot" class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle"
+                                style="display: none; width: 8px; height: 8px;"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-3 shadow-lg" style="width: 300px;" aria-labelledby="notificationBell">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold">Notifications</span>
+                                <button class="btn btn-sm btn-outline-primary" id="markAsRead">Mark All as Read</button>
+                            </div>
+                            <div id="notificationContent" class="overflow-auto" style="max-height: 300px;">
+                                <!-- Notifications will be dynamically injected here -->
+                            </div>
+                        </div>
+                    </li>
+
+
+                <?php endif; ?>
+                <style>
+                    #notificationDot {
+                        display: none;
+                        width: 8px;
+                        height: 8px;
+                        background-color: red;
+                        border-radius: 50%;
+                        position: absolute;
+                        top: 5px;
+                        right: 5px;
+                        transform: translate(0%, 0%);
+                        /* Adjusts the positioning slightly for better alignment */
+                    }
+                </style>
                 <!-- user profile -->
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
                     <li class="nav-item">
@@ -456,6 +493,98 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const notificationDot = document.getElementById("notificationDot");
+            const notificationContent = document.getElementById("notificationContent");
+            const markAsReadButton = document.getElementById("markAsRead");
+
+            // PHP Data
+            const cartCount = <?php echo isset($data['cartItemCount']) ? $data['cartItemCount'] : 0; ?>;
+            const outOfStockItems = <?php echo json_encode($data['outOfStockItems']); ?>;
+            const backInStockItems = <?php echo json_encode($data['backInStockItems']); ?>;
+            const readyForCheckout = <?php echo json_encode($data['readyForCheckout']); ?>;
+
+            const notifications = [];
+            const notifiedProducts = JSON.parse(localStorage.getItem('notifiedProducts')) || [];
+
+            // Add notification for items ready for checkout if cart count > 0 and items are in stock
+            if (cartCount > 0 && readyForCheckout) {
+                notifications.push({
+                    message: `You have ${cartCount} items in your cart ready for checkout.`,
+                    link: "<?php echo URLROOT; ?>/CartController/index",
+                    type: "info",
+                });
+            }
+
+            // Add notification for out-of-stock items
+            if (outOfStockItems.length > 0) {
+                notifications.push({
+                    message: `Some of your cart items are out of stock: ${outOfStockItems.join(', ')}.`,
+                    link: "<?php echo URLROOT; ?>/CartController/index",
+                    type: "danger",
+                });
+            }
+
+            // Add notification for back-in-stock items, but only if not already notified
+            const newBackInStockItems = [];
+            backInStockItems.forEach(item => {
+                // Check if the product has been notified already
+                if (!notifiedProducts.includes(item)) {
+                    newBackInStockItems.push(item);
+                    // Mark this product as notified
+                    notifiedProducts.push(item);
+                }
+            });
+
+            // If there are new back-in-stock items to notify, add them to notifications
+            if (newBackInStockItems.length > 0) {
+                notifications.push({
+                    message: `🎉 Hooray! The following items are back in stock: ${newBackInStockItems.join(', ')} 🎉`,
+                    link: "<?php echo URLROOT; ?>/CartController/index",
+                    type: "success",
+                });
+
+                // Update localStorage with the notified products
+                localStorage.setItem('notifiedProducts', JSON.stringify(notifiedProducts));
+            }
+
+            // Function to display notifications
+            function displayNotifications() {
+                notificationContent.innerHTML = ""; // Clear existing content
+                if (notifications.length === 0) {
+                    notificationContent.innerHTML = `
+                <div class="text-center">
+                   
+                    <p class="mt-2 text-secondary">No notifications currently</p>
+                </div>`;
+                    notificationDot.style.display = "none";
+                } else {
+                    notifications.forEach(notification => {
+                        const alertClass = notification.type === "danger" ? "alert-danger" :
+                            notification.type === "success" ? "alert-success" : "alert-info";
+                        notificationContent.innerHTML += `
+                    <div class="alert ${alertClass} shadow-sm p-2 mb-2">
+                        <a href="${notification.link}" class="text-decoration-none">${notification.message}</a>
+                    </div>`;
+                    });
+                    notificationDot.style.display = "block";
+                }
+            }
+
+            // Mark all notifications as read
+            markAsReadButton.addEventListener("click", () => {
+                notifications.length = 0; // Clear notifications
+                displayNotifications();
+            });
+
+            // Initialize notifications
+            displayNotifications();
+        });
+    </script>
+
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -11,7 +11,7 @@ body {
 .navbar.shrink {
     padding: 4px 0;
     /* Reduced padding when scrolling */
-    background-color: rgba(35, 47, 62, 0.719);
+    background-color: rgba(190, 190, 190, 0.719);
     /* Solid color when scrolled */
 }
 

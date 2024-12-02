@@ -187,4 +187,33 @@ class OrderModel
         $this->db->bind(':id', $id);
         return $this->db->single(); // Returns the image record
     }
+
+
+    // Fetch current order status by order ID
+    public function getOrderStatusById($orderId)
+    {
+        $query = "SELECT orderStatus FROM orders WHERE id = :orderId";
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderId);
+        return $this->db->single()->orderStatus;  // Returns the status as a string ('pending', 'completed', etc.)
+    }
+
+    // Fetch items from an order by order ID
+    public function getOrderItems($orderId)
+    {
+        $query = "SELECT * FROM order_items WHERE orderId = :orderId";
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderId);
+        return $this->db->resultSet(); // Returns all order items for the order
+    }
+
+    // Update order status
+    public function updateStatus($orderId, $status)
+    {
+        $query = "UPDATE orders SET orderStatus = :status WHERE id = :orderId";
+        $this->db->query($query);
+        $this->db->bind(':status', $status);
+        $this->db->bind(':orderId', $orderId);
+        $this->db->execute();
+    }
 }

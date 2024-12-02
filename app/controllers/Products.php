@@ -25,11 +25,43 @@ class Products extends Controller
         $userId = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? null;  // Get the user's role
 
-        // Initialize cart item count
+        // Initialize cart item count and other variables
         $cartItemCount = 0;
+        $outOfStockItems = [];
+        $readyForCheckout = false; // This flag will check if the cart is ready for checkout
+        $backInStockItems = []; // New variable to store items back in stock
+
         if ($userId) {
+            // Get the cart item count
             $cartItemCount = $this->cartModel->count($userId);
             $cartItemCount = isset($cartItemCount->count) ? (int)$cartItemCount->count : 0;
+
+            // Get cart items to check for out-of-stock items and checkout readiness
+            $cartItems = $this->cartModel->getCartItems($userId);
+
+            $readyForCheckout = true; // Assume ready for checkout until proven otherwise
+
+            foreach ($cartItems as $cartItem) {
+                // Get the product by productId
+                $product = $this->productModel->getProductById($cartItem->id); // Assuming you have a method like this
+
+                if ($product) {
+                    // Check if stock is less than cart quantity
+                    if ($product->stock < $cartItem->quantity) {
+                        $outOfStockItems[] = $product->productName; // Add to out of stock list
+                        $readyForCheckout = false; // Cart is not ready for checkout
+                    }
+                }
+            }
+
+            // Check if any product that was out of stock last time is now back in stock
+            foreach ($cartItems as $cartItem) {
+                $product = $this->productModel->getProductById($cartItem->id); // Assuming you have a method like this
+                if ($product && $product->stock > 0) {
+                    // This product is back in stock, add to the back in stock list
+                    $backInStockItems[] = $product->productName;
+                }
+            }
         }
 
         // Retrieve products based on user role
@@ -56,11 +88,16 @@ class Products extends Controller
         $data = [
             'products' => $products,
             'cartItemCount' => $cartItemCount,
+            'outOfStockItems' => $outOfStockItems, // Pass out-of-stock items
+            'backInStockItems' => $backInStockItems, // Pass back-in-stock items
+            'readyForCheckout' => $readyForCheckout, // Pass checkout status
         ];
 
         // Load the view
         $this->view('product/index', $data);
     }
+
+
 
 
 

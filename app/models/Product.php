@@ -250,7 +250,7 @@ class Product
             throw new Exception("Failed to update stock for product ID: $productId");
         }
     }
-
+    // publish and withhold stock part
     public function toggleWithholdStatus($productId, $status)
     {
         $query = "UPDATE products SET isWithheld = :status WHERE id = :productId";
