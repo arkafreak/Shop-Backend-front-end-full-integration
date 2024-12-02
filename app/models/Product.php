@@ -241,22 +241,37 @@ class Product
 
     public function reduceStock($productId, $quantity)
     {
-        $sql = "UPDATE products SET stock = stock - :quantity WHERE id = :productId AND stock >= :quantity";
-        $this->db->query($sql);
-        $this->db->bind(':quantity', $quantity);
-        $this->db->bind(':productId', $productId);
-
-        if (!$this->db->execute()) {
-            throw new Exception("Failed to update stock for product ID: $productId");
-        }
+        $query = "UPDATE products SET stock = stock - :quantity WHERE id = :productId";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+        $stmt->execute();
     }
-    // publish and withhold stock part
-    public function toggleWithholdStatus($productId, $status)
+
+    public function restoreStock($productId, $quantity)
     {
-        $query = "UPDATE products SET isWithheld = :status WHERE id = :productId";
-        $this->db->query($query);
-        $this->db->bind(':status', $status);
-        $this->db->bind(':productId', $productId);
-        return $this->db->execute();
+        $query = "UPDATE products SET stock = stock + :quantity WHERE id = :productId";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public function toggleWithholdStatus($productId, $newStatus)
+    {
+        try {
+            // Update the isWithheld status in the database
+            $sql = "UPDATE products SET isWithheld = :isWithheld WHERE id = :id";
+            $this->db->query($sql);
+            $this->db->bind(':isWithheld', $newStatus, PDO::PARAM_INT);
+            $this->db->bind(':id', $productId, PDO::PARAM_INT);
+
+            // Execute the query
+            return $this->db->execute();
+        } catch (Exception $e) {
+            // Log the error for debugging
+            error_log("Error updating isWithheld for Product ID {$productId}: " . $e->getMessage());
+            return false;
+        }
     }
 }

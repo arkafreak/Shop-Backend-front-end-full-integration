@@ -509,7 +509,12 @@
             const notifications = [];
             const notifiedProducts = JSON.parse(localStorage.getItem('notifiedProducts')) || [];
 
-            // Add notification for items ready for checkout if cart count > 0 and items are in stock
+            console.log("Cart count:", cartCount);
+            console.log("Out of stock items:", outOfStockItems);
+            console.log("Back in stock items:", backInStockItems);
+            console.log("Ready for checkout:", readyForCheckout);
+
+            // Add notification for items ready for checkout
             if (cartCount > 0 && readyForCheckout) {
                 notifications.push({
                     message: `You have ${cartCount} items in your cart ready for checkout.`,
@@ -527,59 +532,55 @@
                 });
             }
 
-            // Add notification for back-in-stock items, but only if not already notified
+            // Handle back-in-stock items
             const newBackInStockItems = [];
             backInStockItems.forEach(item => {
-                // Check if the product has been notified already
+                console.log("Checking item:", item);
                 if (!notifiedProducts.includes(item)) {
                     newBackInStockItems.push(item);
-                    // Mark this product as notified
+                    console.log("Added to new back-in-stock items:", item);
                     notifiedProducts.push(item);
                 }
             });
 
-            // If there are new back-in-stock items to notify, add them to notifications
             if (newBackInStockItems.length > 0) {
                 notifications.push({
                     message: `🎉 Hooray! The following items are back in stock: ${newBackInStockItems.join(', ')} 🎉`,
                     link: "<?php echo URLROOT; ?>/CartController/index",
                     type: "success",
                 });
-
-                // Update localStorage with the notified products
                 localStorage.setItem('notifiedProducts', JSON.stringify(notifiedProducts));
+                console.log("Updated notified products:", notifiedProducts);
             }
 
-            // Function to display notifications
             function displayNotifications() {
                 notificationContent.innerHTML = ""; // Clear existing content
+                console.log("Notifications to render:", notifications);
+
                 if (notifications.length === 0) {
                     notificationContent.innerHTML = `
-                <div class="text-center">
-                   
-                    <p class="mt-2 text-secondary">No notifications currently</p>
-                </div>`;
+            <div class="text-center">
+                <p class="mt-2 text-secondary">No notifications currently</p>
+            </div>`;
                     notificationDot.style.display = "none";
                 } else {
                     notifications.forEach(notification => {
                         const alertClass = notification.type === "danger" ? "alert-danger" :
                             notification.type === "success" ? "alert-success" : "alert-info";
                         notificationContent.innerHTML += `
-                    <div class="alert ${alertClass} shadow-sm p-2 mb-2">
-                        <a href="${notification.link}" class="text-decoration-none">${notification.message}</a>
-                    </div>`;
+                <div class="alert ${alertClass} shadow-sm p-2 mb-2">
+                    <a href="${notification.link}" class="text-decoration-none">${notification.message}</a>
+                </div>`;
                     });
                     notificationDot.style.display = "block";
                 }
             }
 
-            // Mark all notifications as read
             markAsReadButton.addEventListener("click", () => {
                 notifications.length = 0; // Clear notifications
                 displayNotifications();
             });
 
-            // Initialize notifications
             displayNotifications();
         });
     </script>

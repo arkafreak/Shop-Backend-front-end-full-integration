@@ -216,4 +216,15 @@ class OrderModel
         $this->db->bind(':orderId', $orderId);
         $this->db->execute();
     }
+
+    public function getPendingOrdersWithinTimeframe($userId, $seconds)
+    {
+        $timeLimit = time() - $seconds;
+        $query = "SELECT * FROM orders WHERE userId != :userId AND orderStatus = 'pending' AND createdAt > :timeLimit";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':timeLimit', date('Y-m-d H:i:s', $timeLimit), PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 }
