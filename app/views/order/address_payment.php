@@ -10,10 +10,38 @@
 </head>
 
 <body class="bg-light">
+
+    <!-- Header Section (Navigation Bar) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="<?php echo URLROOT; ?>/home">Your Store</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/products">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/OrderController/purchaseHistory">Order History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/CartController/index">Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/UserController/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container py-5">
         <h2 class="text-center mb-4">Address and Payment</h2>
         <h4 class="mb-4">Order Details</h4>
-        
+
         <!-- Order Table (responsive) -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
@@ -32,7 +60,13 @@
                             <?php if (!empty($cartItems)): ?>
                                 <?php foreach ($cartItems as $item): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($item->productName); ?></td>
+                                        <td><?php echo htmlspecialchars($item->productName); ?>
+                                            <?php if ($item->image_name): ?>
+                                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="<?php echo htmlspecialchars($item->productName); ?> image" width="50">
+                                            <?php else: ?>
+                                                <span>No Image Available</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?php echo htmlspecialchars($item->brand); ?></td>
                                         <td>₹<?php echo number_format($item->sellingPrice); ?></td>
                                         <td><?php echo htmlspecialchars($item->quantity); ?></td>
@@ -127,6 +161,18 @@
             <button type="submit" class="btn btn-dark btn-lg w-20">Go Back to Cart</button>
         </form>
     </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Your Store. All Rights Reserved.</p>
+            <p>Follow us on:
+                <a href="#" class="text-white ml-2">Facebook</a> |
+                <a href="#" class="text-white ml-2">Twitter</a> |
+                <a href="#" class="text-white ml-2">Instagram</a>
+            </p>
+        </div>
+    </footer>
 
     <!-- Bootstrap JS and dependencies (Updated Popper CDN) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

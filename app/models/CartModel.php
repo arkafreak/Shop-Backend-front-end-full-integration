@@ -49,15 +49,17 @@ class CartModel
     // Fetch cart items for the specified user
     public function getCartItems($userId)
     {
-        $query = "SELECT p.id, p.productName, p.brand, p.sellingPrice, c.quantity
-                  FROM cart c
-                  JOIN products p ON c.productId = p.id
-                  WHERE c.userId = :userId";
+        $query = "SELECT p.id, p.productName, p.brand, p.sellingPrice, c.quantity, 
+                     (SELECT image_name FROM Product_images WHERE product_id = p.id LIMIT 1) AS image_name
+              FROM cart c
+              JOIN products p ON c.productId = p.id
+              WHERE c.userId = :userId";
 
         $this->db->query($query);
         $this->db->bind(':userId', $userId);
         return $this->db->resultSet(); // Fetch all results
     }
+
 
     // Add product to the cart or return error if already in cart
     public function addToCart($userId, $productId)

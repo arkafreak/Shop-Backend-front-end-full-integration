@@ -10,18 +10,21 @@ class OrderHistoryModel
 
     public function getPurchasedProductsByUser($userId)
     {
-        $query = "SELECT p.id, p.productName, p.brand, oi.quantity, o.createdAt AS purchase_date
-                  FROM order_items oi
-                  JOIN products p ON oi.productId = p.id
-                  JOIN orders o ON oi.orderId = o.id
-                  WHERE o.orderStatus = 'completed' AND o.userId = :userId
-                  ORDER BY o.createdAt DESC";
+        $query = "SELECT p.id, p.productName, p.brand, oi.quantity, p.isWithheld, o.createdAt AS purchase_date,
+                     (SELECT image_name FROM Product_images WHERE product_id = p.id LIMIT 1) AS image_name
+              FROM order_items oi
+              JOIN products p ON oi.productId = p.id
+              JOIN orders o ON oi.orderId = o.id
+              WHERE o.orderStatus = 'completed' AND o.userId = :userId
+              ORDER BY o.createdAt DESC";
 
         $this->db->query($query);
         $this->db->bind(':userId', $userId);
 
         return $this->db->resultSet();
     }
+
+
 
     public function getOrderHistoryByCustomerId($userId)
     {

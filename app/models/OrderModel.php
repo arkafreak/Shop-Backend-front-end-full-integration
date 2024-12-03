@@ -32,6 +32,15 @@ class OrderModel
 
         return $stmt->execute(); // Returns true on success
     }
+
+    public function updateOrderPayment($orderId, $paymentMethod)
+    {
+        $stmt = $this->db->prepare("UPDATE orders SET paymentMethod = :paymentMethod where id =: orderId");
+        $stmt->bindParam(':paymentMethod', $paymentMethod);
+        $stmt->bindParam(':orderId', $orderId);
+        return $stmt->execute();
+    }
+
     public function getTotalAmountByOrderId()
     {
         $table = 'orders';

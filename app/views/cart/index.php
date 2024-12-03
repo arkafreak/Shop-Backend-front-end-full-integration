@@ -44,7 +44,8 @@
                     ?>
                         <div class="cart-item row align-items-center border rounded shadow-sm mb-3 p-2 bg-white">
                             <div class="col-4 col-md-3">
-                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded">
+                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded"
+                                alt="image" width="200">
                             </div>
                             <div class="col-8 col-md-6">
                                 <h5 class="mb-2 text-truncate" style="max-width: 250px;"><?php echo htmlspecialchars($item->productName); ?></h5>
