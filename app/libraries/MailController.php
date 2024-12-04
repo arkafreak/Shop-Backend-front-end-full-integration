@@ -116,4 +116,42 @@ class MailController extends Controller
             echo "Email could not be sent: {$this->mailer->ErrorInfo}";
         }
     }
+    public function sendEmail($to, $subject, $username, $orderId, $selectedItems)
+    {
+        try {
+            $this->setupMailer(); // Setup PHPMailer configuration
+
+            // Add recipient
+            $this->mailer->addAddress($to);
+
+            // Set email format to HTML for better formatting
+            $this->mailer->isHTML(true);
+            $this->mailer->Subject = $subject;
+
+            // Prepare the message with more details
+            $message = "<h2>Order Cancellation Notification</h2>";
+            $message .= "<p>Dear " . $username . ",</p>";
+            $message .= "<p>We regret to inform you that your order with Order ID: <strong>" . $orderId . "</strong> has been canceled due to inactivity.</p>";
+            $message .= "<p><strong>Cancelled Items:</strong></p>";
+            $message .= "<ul>";
+
+            // Loop through selected items to display ordered products that were canceled
+            foreach ($selectedItems as $item) {
+                $message .= "<li>" . $item->productName . " - Quantity: " . $item->quantity . " - Price: $" . $item->sellingPrice . "</li>";
+            }
+
+            $message .= "</ul>";
+            $message .= "<p>We apologize for the inconvenience. If you have any questions or concerns, please do not hesitate to contact our support team.</p>";
+            $message .= "<p>Thank you for shopping with us.</p>";
+
+            // Set the body of the email
+            $this->mailer->Body = $message;
+
+            // Send the email
+            $this->mailer->send();
+            echo 'Message has been sent successfully';
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$this->mailer->ErrorInfo}";
+        }
+    }
 }

@@ -30,7 +30,6 @@ class OrderController extends Controller
 
     public function addressPayment()
     {
-        //echo "Working";
         $userId = $_SESSION['user_id'];
         $cartItems = $this->cartModel->getCartItems($userId);
 
@@ -40,14 +39,27 @@ class OrderController extends Controller
             $totalAmount += $item->sellingPrice * $item->quantity;
         }
 
+        // Create an order with paymentMethod as NULL
+        $orderId = $this->orderModel->createOrder($userId, $totalAmount, 'pending', null);
+
+        // Reduce stock for each product
+        foreach ($cartItems as $item) {
+            $this->productModel->reduceStock($item->id, $item->quantity);
+        }
+        // After creating the order, update cart items with the order ID
+        $orderIdNumber = $this->orderModel->getLatestOrderIdByUserId($userId);
+        $userId = $_SESSION['user_id'];  // Assuming the user is logged in
+        $this->cartModel->updateCartWithOrderId($orderIdNumber, $userId);
         // Pass data to the view
         $data = [
             'cartItems' => $cartItems,
-            'totalAmount' => $totalAmount
+            'totalAmount' => $totalAmount,
+            'orderId' => $orderId,
         ];
 
         $this->view('order/address_payment', $data);
     }
+
     public function confirm()
     {
         // Ensure the user is logged in
@@ -56,41 +68,71 @@ class OrderController extends Controller
         }
 
         $userId = $_SESSION['user_id'];
-
-        // Validate and sanitize input data
         $paymentMethod = htmlspecialchars($_POST['paymentMethod']); // Get the payment method from the form
 
-        // Calculate total amount
+        // Get the latest order created by the user
+        $orderId = $this->orderModel->getLatestOrderIdByUserId($userId);
+
+        if (!$orderId) {
+            echo "No order found to confirm.";
+            return;
+        }
+
+        // Update the order with the selected payment method
+        $this->orderModel->updateOrderPaymentMethod($orderId, $paymentMethod);
+
+        // Get cart items for the user
         $cartItems = $this->cartModel->getCartItems($userId);
+
+        $outOfStock = false; // Flag to track if any item is out of stock
+        foreach ($cartItems as $item) {
+            // Check the availability of the product in the products table
+            $product = $this->productModel->getProductById($item->productId);
+
+            // If quantity in cart exceeds available stock
+            if ($product && $item->quantity > $product->quantity) {
+                $outOfStock = true;
+                // Show message indicating the product is out of stock
+                echo "The item '{$product->productName}' is no longer in stock. ";
+            }
+        }
+
+        // If any product was out of stock, stop the order confirmation
+        if ($outOfStock) {
+            echo "Please adjust your cart and try again.";
+            return;
+        }
+
+        // Calculate total amount (optional, you can reuse if needed)
         $totalAmount = 0;
         foreach ($cartItems as $item) {
             $totalAmount += $item->sellingPrice * $item->quantity;
         }
 
-        // Save the order to the database with status "pending"
-        $orderId = $this->orderModel->createOrder($userId, $totalAmount, 'pending', $paymentMethod);
+        // // After creating the order, update cart items with the order ID
+        // $userId = $_SESSION['user_id'];  // Assuming the user is logged in
+        // $this->cartModel->updateCartWithOrderId($orderId, $userId);
 
-        $orderId = $this->orderModel->getLatestOrderIdByUserId($userId);
 
-        // echo "$orderId";
-        // Redirect to the payment page based on selected method
+        // Proceed with the payment based on selected method
         if ($paymentMethod === 'paypal') {
             $this->view('paypal/index');
         } elseif ($paymentMethod === 'stripe') {
             // Create a Stripe Checkout session
             $checkoutURL = $this->stripeServices->createCheckoutSession($cartItems, $userId);
             if ($checkoutURL) {
-                // Redirect to Stripe Checkout page
                 header("Location: " . $checkoutURL);
                 exit();
             } else {
-                //
+                echo "Stripe session creation failed.";
             }
         } else {
-            // Handle invalid payment methods if necessary
             echo "Invalid payment method selected.";
         }
     }
+
+
+
 
     public function checkout()
     {
@@ -127,7 +169,7 @@ class OrderController extends Controller
             $this->orderModel->addOrderItem($orderId, $item->id, $item->quantity);
 
             // Update stock for the purchased products
-            $this->productModel->reduceStock($item->id, $item->quantity);
+            // $this->productModel->reduceStock($item->id, $item->quantity);
         }
 
         // Clear the cart after successful order

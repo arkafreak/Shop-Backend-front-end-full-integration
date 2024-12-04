@@ -238,24 +238,66 @@ class Product
         // Return the images array or false if no images found
         return $images ? $images : false;
     }
-
+    //reduce stock and restore stock part
     public function reduceStock($productId, $quantity)
     {
-        $query = "UPDATE products SET stock = stock - :quantity WHERE id = :productId";
+        // Check the current stock for the product
+        $query = "SELECT stock FROM products WHERE id = :productId";
         $stmt = $this->db->prepare($query);
-        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
         $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
         $stmt->execute();
+        $currentStock = $stmt->fetchColumn();
+
+        // If there's enough stock, reduce it, otherwise do nothing
+        if ($currentStock >= $quantity) {
+            $query = "UPDATE products SET stock = stock - :quantity WHERE id = :productId";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+            $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+            $stmt->execute();
+        }
     }
 
-    public function restoreStock($productId, $quantity)
+
+    public function getProductQuantityFromCart($productId, $orderId)
     {
-        $query = "UPDATE products SET stock = stock + :quantity WHERE id = :productId";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
-        $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
-        $stmt->execute();
+        // Build the query to get the quantity from the cart table for the given productId and orderId
+        $query = "SELECT SUM(quantity) AS quantity FROM cart WHERE productId = :productId AND orderId = :orderId";
+
+        // Prepare and execute the query
+        $this->db->query($query);
+        $this->db->bind(':productId', $productId);
+        $this->db->bind(':orderId', $orderId);
+
+        // Get the result
+        $result = $this->db->single(); // Using single() to expect one result
+
+        // Return the quantity (or 0 if no result found)
+        return $result ? $result->quantity : 0;
     }
+
+
+
+
+    public function increaseStockByCartQuantity($productId, $quantity)
+    {
+        if ($quantity > 0) {
+            // Prepare the query to increase the stock
+            $query = "UPDATE products SET stock = stock + :quantity WHERE id = :productId";
+
+            // Execute the query
+            $this->db->query($query);
+            $this->db->bind(':quantity', $quantity);
+            $this->db->bind(':productId', $productId);
+
+            return $this->db->execute(); // Returns true if successful, false otherwise
+        }
+
+        return false; // If no quantity found or invalid, return false
+    }
+
+
+
 
     public function toggleWithholdStatus($productId, $newStatus)
     {

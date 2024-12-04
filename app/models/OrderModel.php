@@ -236,4 +236,65 @@ class OrderModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+    //update paymentMethod
+    public function updateOrderPaymentMethod($orderId, $paymentMethod)
+    {
+        $sql = "UPDATE orders SET paymentMethod = :paymentMethod WHERE id = :orderId";
+        $this->db->query($sql);
+        $this->db->bind(':paymentMethod', $paymentMethod);
+        $this->db->bind(':orderId', $orderId);
+        return $this->db->execute();
+    }
+
+    public function getPendingOrdersOlderThan($minutes)
+    {
+        // SQL query to fetch pending orders older than specified minutes
+        $query = "SELECT * FROM orders WHERE orderStatus = 'pending' AND createdAt <= NOW() - INTERVAL :minutes MINUTE";
+
+        // Prepare and execute the query
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':minutes', $minutes, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Fetch and return the orders
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function getUserByOrderId($orderId)
+    {
+        $query = "SELECT u.id, u.name, u.email FROM users u JOIN orders o ON u.id = o.userId WHERE o.id = :orderId";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':orderId', $orderId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_OBJ); // Assuming you're fetching a single user
+    }
+    public function getOrderById($orderId)
+    {
+        $sql = "SELECT * FROM orders WHERE id = :orderId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':orderId', $orderId, PDO::PARAM_INT);
+        $stmt->execute();
+        $order = $stmt->fetch(PDO::FETCH_OBJ);
+        return $order;
+    }
+
+    public function getCartQuantity($orderId, $productId)
+    {
+        // Query to get the quantity of a product in a user's cart for a specific order
+        $query = "SELECT quantity FROM cart WHERE userId = (SELECT userId FROM orders WHERE id = :orderId) AND productId = :productId";
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderId);
+        $this->db->bind(':productId', $productId);
+
+        // Return the result as a single value (quantity)
+        return $this->db->single()->quantity;
+    }
+    public function getOrderItemsFromCart($orderId)
+    {
+        $query = "SELECT productId, quantity FROM cart WHERE orderId = :orderId";
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderId);
+
+        return $this->db->resultSet(); // Ensure this returns an array of objects or associative arrays
+    }
 }

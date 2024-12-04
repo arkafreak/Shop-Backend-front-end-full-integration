@@ -219,13 +219,22 @@ class CartModel
 
     public function isProductInCartt($productId, $userId)
     {
-        $query = "SELECT COUNT(*) as count 
-              FROM cart 
+        $query = "SELECT COUNT(*) as count
+              FROM cart
               WHERE productId = :productId AND userId = :userId";
         $this->db->query($query);
         $this->db->bind(':productId', $productId);
         $this->db->bind(':userId', $userId);
         $result = $this->db->single();
         return $result->count > 0; // Returns true if count > 0, otherwise false
+    }
+
+    public function updateCartWithOrderId($orderIdNumber, $userId)
+    {
+        $query = "UPDATE cart SET orderId = :orderId WHERE userId = :userId";
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderIdNumber);
+        $this->db->bind(':userId', $userId);
+        return $this->db->execute();
     }
 }
