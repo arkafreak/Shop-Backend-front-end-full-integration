@@ -26,6 +26,17 @@
             </div>
         </div>
     </header>
+    <!-- <td>
+        <img
+            style="max-width: 400px; 
+               text-align: center; 
+               padding: 20px 0; 
+               background-color: white; 
+               mix-blend-mode: multiply; 
+               filter: brightness(1) contrast(601%) ;"
+            src="https://w7.pngwing.com/pngs/1012/770/png-transparent-amazon-logo-amazon-com-amazon-video-logo-company-brand-amazon-logo-miscellaneous-wish-text.png"
+            alt="Company Logo" />
+    </td> -->
 
     <!-- Main Content: Cart -->
     <div class="container mt-5">
@@ -45,7 +56,7 @@
                         <div class="cart-item row align-items-center border rounded shadow-sm mb-3 p-2 bg-white">
                             <div class="col-4 col-md-3">
                                 <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded"
-                                alt="image" width="200">
+                                    alt="image" width="200">
                             </div>
                             <div class="col-8 col-md-6">
                                 <h5 class="mb-2 text-truncate" style="max-width: 250px;"><?php echo htmlspecialchars($item->productName); ?></h5>
@@ -87,7 +98,7 @@
                                 <?php if (!empty($stockMessage)): ?>
                                     <p class=" txt text-warning mt-2"><?php echo $stockMessage; ?></p>
                                     <style>
-                                        .txt{
+                                        .txt {
                                             color: orangered !important;
                                         }
                                     </style>

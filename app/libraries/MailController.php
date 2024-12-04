@@ -31,73 +31,101 @@ class MailController extends Controller
     public function sendTransactionEmail($userEmail, $username, $orderId, $totalAmount, $paymentMethod, $selectedItems)
     {
         // Prepare the transaction details message with external image links
-        $transactionDetails = "<p>Dear <strong>$username,</strong></p>" .
-            "<p>Thank you for your order! We are pleased to inform you that your payment of Rs. $totalAmount has been processed successfully.</p>" .
-            "<p>Here are the details of your order:</p>" .
-            "<hr>" .
+        $transactionDetails = "
+    <table width='100%' cellpadding='0' cellspacing='0' style='background-color:#f4f4f4; padding: 20px;'>
+        <tr>
+            <td style='text-align:center; padding: 20px 0;'>
+                <img src='https://w7.pngwing.com/pngs/1012/770/png-transparent-amazon-logo-amazon-com-amazon-video-logo-company-brand-amazon-logo-miscellaneous-wish-text.png' alt='Company Logo' style='max-width: 200px;' />
+            </td>
+        </tr>
+        <tr>
+            <td style='background-color:#ffffff; padding: 20px; border-radius: 8px;'>
+                <h2 style='color:#333333;'>Order Confirmation</h2>
+                <p style='font-size: 16px; color:#555555;'>Dear <strong>$username</strong>,</p>
+                <p style='font-size: 16px; color:#555555;'>Thank you for your order! We are pleased to inform you that your payment of <strong>Rs. $totalAmount</strong> has been processed successfully.</p>
+                <p style='font-size: 16px; color:#555555;'>Here are the details of your order:</p>
+                <hr style='border:1px solid #e0e0e0; margin:20px 0;'>
+                
+                <!-- Order Details Table -->
+                <table style='width: 100%; border-collapse: collapse;'>
+                    <thead>
+                        <tr style='background-color:#f8f8f8;'>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Order ID</th>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Total Amount</th>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Status</th>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Payment Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style='padding: 8px; text-align:left; font-size: 14px; color:#333333;'>#$orderId</td>
+                            <td style='padding: 8px; text-align:left; font-size: 14px; color:#333333;'>Rs. $totalAmount</td>
+                            <td style='padding: 8px; text-align:left; font-size: 14px; color:#333333;'>Completed</td>
+                            <td style='padding: 8px; text-align:left; font-size: 14px; color:#333333;'>$paymentMethod</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            // Add the order details in a table with center-aligned values
-            "<table border='1' cellpadding='10' cellspacing='0' style='width: 100%; border-collapse: collapse;'>" .
-            "<tr>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Order ID</th>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Total Amount</th>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Status</th>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Payment Method</th>" .
-            "</tr>" .
-            "<tr>" .
-            "<td style='text-align: center;'>$orderId</td>" .
-            "<td style='text-align: center;'>Rs. $totalAmount</td>" .
-            "<td style='text-align: center;'>Completed</td>" .
-            "<td style='text-align: center;'>$paymentMethod</td>" .
-            "</tr>" .
-            "</table>" .
+                <p style='font-size: 16px; color:#555555;'><strong>Order Items:</strong></p>
 
-            // Add the order items details in a table
-            "<p><strong>Order Items:</strong></p>" .
-            "<table border='1' cellpadding='10' cellspacing='0' style='width: 100%; border-collapse: collapse;'>" .
-            "<tr>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Product Name</th>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Price</th>" .
-            "<th style='background-color: #f2f2f2; text-align: center;'>Quantity</th>" .
-            "</tr>";
+                <!-- Order Items Table -->
+                <table style='width: 100%; border-collapse: collapse;'>
+                    <thead>
+                        <tr style='background-color:#f8f8f8;'>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Product Name</th>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Price</th>
+                            <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
 
         // Loop through selected items and display them in the table
         foreach ($selectedItems as $item) {
-            $transactionDetails .= "<tr>" .
-                "<td style='text-align: center;'>" . $item['productName'] . "</td>" .
-                "<td style='text-align: center;'>Rs. " . $item['sellingPrice'] . "</td>" .
-                "<td style='text-align: center;'>" . $item['quantity'] . "</td>" .
-                "</tr>";
+            $transactionDetails .= "
+        <tr>
+            <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item['productName']}</td>
+            <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$item['sellingPrice']}</td>
+            <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item['quantity']}</td>
+        </tr>";
         }
 
         // Close the order items table
-        $transactionDetails .= "</table>" .
-
-            "<p>You will receive an email confirmation shortly with more details regarding the shipping of your order.</p>" .
-            "<p>If you have any questions or need further assistance, feel free to contact us at <a href='mailto:freak.ghost11@gmail.com'>support@freakproducts.com</a>.</p>" .
-            "<p>Thank you for choosing Freak Products!</p>" .
-            "<p>Best Regards,<br><strong>The Freak Products Team</strong></p>";
+        $transactionDetails .= "</tbody></table>";
 
         // Add payment method logo
         if ($paymentMethod == 'paypal') {
-            $transactionDetails .=
-                '<table border="0" cellpadding="1" cellspacing="0">' .
-                '<tr><td></td></tr>' .
-                '<tr><td>' .
-                '<a href="https://www.paypal.com/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open(\'https://www.paypal.com/webapps/mpp/paypal-popup\',\'WIPaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\'); return false;">' .
-                '<img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg" border="0" alt="PayPal Acceptance Mark">' .
-                '</a>' .
-                '</td></tr>' .
-                '</table>';
+            $transactionDetails .= "
+        <hr style='border:1px solid #e0e0e0; margin:20px 0;'>
+        <p style='font-size: 16px; color:#555555;'>Paid via PayPal</p>
+        <table border='0' cellpadding='1' cellspacing='0' style='width: 100%;'>
+            <tr><td style='text-align:center;'>
+                <a href='https://www.paypal.com/webapps/mpp/paypal-popup' title='How PayPal Works' onclick='javascript:window.open(\"https://www.paypal.com/webapps/mpp/paypal-popup\",\"WIPaypal\",\"toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\"); return false;'>
+                    <img src='https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg' alt='PayPal Acceptance Mark' style='max-width: 200px;'>
+                </a>
+            </td></tr>
+        </table>";
         } elseif ($paymentMethod == 'stripe') {
-            $transactionDetails .=
-                '<table border="0" cellpadding="1" cellspacing="0">' .
-                '<tr><td></td></tr>' .
-                '<tr><td>' .
-                '<img src="https://media.designrush.com/inspiration_images/656402/conversions/3-desktop.jpg" alt="Stripe Logo" style="width: 100%; height: auto; object-fit: cover;">' .
-                '</td></tr>' .
-                '</table>';
+            $transactionDetails .= "
+        <hr style='border:1px solid #e0e0e0; margin:20px 0;'>
+        <p style='font-size: 16px; color:#555555;'>Paid via Stripe</p>
+        <table border='0' cellpadding='1' cellspacing='0' style='width: 100%;'>
+            <tr><td style='text-align:center;'>
+                <img src='https://media.designrush.com/inspiration_images/656402/conversions/3-desktop.jpg' alt='Stripe Logo' style='max-width: 100%; height: auto;'>
+            </td></tr>
+        </table>";
         }
+
+        // Closing email content
+        $transactionDetails .= "
+        <hr style='border:1px solid #e0e0e0; margin:20px 0;'>
+        <p style='font-size: 16px; color:#555555;'>You will receive an email confirmation shortly with more details regarding the shipping of your order.</p>
+        <p style='font-size: 16px; color:#555555;'>If you have any questions or need further assistance, feel free to contact us at <a href='mailto:support@freakproducts.com'>support@freakproducts.com</a>.</p>
+        <p style='font-size: 16px; color:#555555;'>Thank you for choosing Freak Products!</p>
+        <p style='font-size: 16px; color:#555555;'>Best regards,</p>
+        <p style='font-size: 16px; color:#555555;'><strong>The Freak Products Team</strong></p>
+    </td>
+</tr>
+</table>";
 
         // Send email using your mailer object
         try {
@@ -116,7 +144,8 @@ class MailController extends Controller
             echo "Email could not be sent: {$this->mailer->ErrorInfo}";
         }
     }
-    public function sendEmail($to, $subject, $username, $orderId, $selectedItems)
+
+    public function sendEmail($to, $subject, $username, $orderId, $cartItems)
     {
         try {
             $this->setupMailer(); // Setup PHPMailer configuration
@@ -124,30 +153,61 @@ class MailController extends Controller
             // Add recipient
             $this->mailer->addAddress($to);
 
-            // Set email format to HTML for better formatting
+            // Set email format to HTML
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
 
-            // Prepare the message with more details
-            $message = "<h2>Order Cancellation Notification</h2>";
-            $message .= "<p>Dear " . $username . ",</p>";
-            $message .= "<p>We regret to inform you that your order with Order ID: <strong>" . $orderId . "</strong> has been canceled due to inactivity.</p>";
-            $message .= "<p><strong>Cancelled Items:</strong></p>";
-            $message .= "<ul>";
+            // Email Header with company logo and greeting
+            $message = "<table width='100%' cellpadding='0' cellspacing='0' style='background-color:#f4f4f4; padding: 20px;'>
+            <tr>
+                <td style='text-align:center; padding: 20px 0;'>
+                    <img src='https://w7.pngwing.com/pngs/1012/770/png-transparent-amazon-logo-amazon-com-amazon-video-logo-company-brand-amazon-logo-miscellaneous-wish-text.png' alt='Company Logo' style='max-width: 200px;' />
+                </td>
+            </tr>
+            <tr>
+                <td style='background-color:#ffffff; padding: 20px; border-radius: 8px;'>
+                    <h2 style='color:#333333;'>Order Cancellation Notification</h2>
+                    <p style='font-size: 16px; color:#555555;'>Dear <strong>$username</strong>,</p>
+                    <p style='font-size: 16px; color:#555555;'>We regret to inform you that your order with Order ID: <strong>#{$orderId}</strong> has been canceled due to inactivity.</p>
+                    <p style='font-size: 16px; color:#555555;'>Please find the details of the canceled items below:</p>
+
+                    <table style='width: 100%; border-collapse: collapse;'>
+                        <thead>
+                            <tr style='background-color:#f8f8f8;'>
+                                <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Product Name</th>
+                                <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Quantity</th>
+                                <th style='padding: 8px; text-align:left; font-size: 14px; color: #333333;'>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
 
             // Loop through selected items to display ordered products that were canceled
-            foreach ($selectedItems as $item) {
-                $message .= "<li>" . $item->productName . " - Quantity: " . $item->quantity . " - Price: $" . $item->sellingPrice . "</li>";
+            foreach ($cartItems as $item) {
+                $message .= "
+            <tr>
+                <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->productName}</td>
+                <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->quantity}</td>
+                <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$item->totalAmount}</td>
+            </tr>";
             }
 
-            $message .= "</ul>";
-            $message .= "<p>We apologize for the inconvenience. If you have any questions or concerns, please do not hesitate to contact our support team.</p>";
-            $message .= "<p>Thank you for shopping with us.</p>";
+            $message .= "</tbody></table>";
 
-            // Set the body of the email
+            // Total Amount section
+            $message .= "
+            <p style='font-size: 16px; color:#555555;'><strong>Total Amount: Rs. {$item->totalAmount}</strong></p>
+            <p style='font-size: 16px; color:#555555;'>We apologize for the inconvenience caused by this cancellation. If you have any questions or concerns, please do not hesitate to contact our customer support team.</p>
+            <p style='font-size: 16px; color:#555555;'>Thank you for shopping with us!</p>
+            <br/>
+            <p style='font-size: 16px; color:#555555;'>Best regards,</p>
+            <p style='font-size: 16px; color:#555555;'><strong>Freak Products Pvt Ltd</strong></p>
+            <p style='font-size: 14px; color:#888888;'>If you need assistance, feel free to <a href='mailto:freak.ghost11@gmail.com'>contact support</a>.</p>
+        </td>
+    </tr>
+</table>";
+
+            // Set the body and send the email
             $this->mailer->Body = $message;
-
-            // Send the email
             $this->mailer->send();
             echo 'Message has been sent successfully';
         } catch (Exception $e) {

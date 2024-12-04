@@ -297,4 +297,28 @@ class OrderModel
 
         return $this->db->resultSet(); // Ensure this returns an array of objects or associative arrays
     }
+
+    public function getOrderItemsFromCartForMail($orderId)
+    {
+        $query = "
+        SELECT
+            c.productId,
+            c.quantity,
+            p.productName,
+            o.totalAmount
+        FROM
+            cart c
+        INNER JOIN
+            products p ON c.productId = p.id
+        INNER JOIN
+            orders o ON c.orderId = o.id
+        WHERE
+            c.orderId = :orderId
+    ";
+
+        $this->db->query($query);
+        $this->db->bind(':orderId', $orderId);
+
+        return $this->db->resultSet(); // Returns an array of objects or associative arrays
+    }
 }

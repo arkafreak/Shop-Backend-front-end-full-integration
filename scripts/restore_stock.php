@@ -49,20 +49,22 @@ foreach ($orders as $order) {
     $user = $orderModel->getUserByOrderId($order->id);  // Get user info based on the order
 
     if ($user) {
-        // Get full order details for the email (including cart items)
+        // Retrieve order details
         $orderDetails = $orderModel->getOrderById($order->id);
 
-        // Prepare the email subject
-        $subject = "Your Order has been Canceled";
+        // Retrieve cart items
+        $cartItems = $orderModel->getOrderItemsFromCartForMail($order->id);
 
-        // Send the cancellation email to the user
+        // Prepare email subject
+        $subject = "Your Order has been Cancelled";
+
+        // Send email with all details
         $mailController->sendEmail(
             $user->email,
             $subject,
             $user->name,
             $orderDetails->id,
-            $orderDetails->totalAmount, // Send total amount if needed
-            $cartItems // Send cart items for cancellation notification
+            $cartItems
         );
     }
 }

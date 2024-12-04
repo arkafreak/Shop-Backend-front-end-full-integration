@@ -7,9 +7,51 @@
     <title>Address and Payment</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/payment_page.css">
+
+    <style>
+        /* Style for the countdown timer */
+        .countdown-timer {
+            background-color: #ffcc00;
+            color: #000;
+            font-size: 14px;
+            /* Reduced font size */
+            text-align: center;
+            padding: 10px 0;
+            /* Reduced padding */
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            box-sizing: border-box;
+        }
+
+        /* Make countdown timer responsive */
+        @media (max-width: 768px) {
+            .countdown-timer {
+                font-size: 12px;
+                /* Adjust font size on smaller screens */
+                padding: 10px 0;
+                /* Adjust padding on smaller screens */
+            }
+        }
+
+        /* Adjust navbar padding to ensure no overlap with the countdown timer */
+        nav.navbar {
+            margin-top: 40px;
+            /* Add margin to navbar to avoid overlap */
+        }
+    </style>
+
 </head>
 
 <body class="bg-light">
+
+    <!-- Countdown Timer -->
+    <div class="countdown-timer" id="countdown">
+        Time left for checkout: <span id="timer"></span>
+    </div>
 
     <!-- Header Section (Navigation Bar) -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -36,7 +78,6 @@
             </div>
         </div>
     </nav>
-
 
     <!-- Main Content -->
     <div class="container py-5">
@@ -175,10 +216,28 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS and dependencies (Updated Popper CDN) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript for Countdown Timer and Redirect -->
+    <script>
+        // Countdown timer logic
+        var countdownElement = document.getElementById('timer');
+        var secondsLeft = 60; // 10 minutes countdown
+
+        function updateCountdown() {
+            var minutes = Math.floor(secondsLeft / 60);
+            var seconds = secondsLeft % 60;
+            countdownElement.innerHTML = minutes + "m " + seconds + "s";
+            secondsLeft--;
+
+            // Redirect when countdown ends
+            if (secondsLeft < 0) {
+                window.location.href = "<?php echo URLROOT; ?>/CartController"; // Redirect to cart
+            }
+        }
+
+        // Start the countdown
+        setInterval(updateCountdown, 1000);
+    </script>
+
 </body>
 
 </html>
