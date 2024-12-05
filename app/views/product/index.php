@@ -139,6 +139,12 @@
             </ul>
         </div>
     </nav>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger text-center">
+            <?php echo $_SESSION['error']; ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <?php
     // Initialize the variable at the top of your view
@@ -375,12 +381,7 @@
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
 
-                                        <?php if (!empty($product->isInCart)): ?>
-                                            <!-- Can't Withhold Option (If in Cart) -->
-                                            <button class="btn btn-secondary btn-sm disabled" style="background-color: #ccc; color: #808080;">
-                                                <i class="fas fa-ban"></i> Can't Withhold (In Cart)
-                                            </button>
-                                        <?php elseif ($product->isWithheld): ?>
+                                        <?php if ($product->isWithheld): ?>
                                             <!-- Publish Option (If Withheld) -->
                                             <a href="<?php echo URLROOT; ?>/products/toggleWithhold/<?php echo $product->id; ?>"
                                                 class="btn btn-success btn-sm"
@@ -388,7 +389,7 @@
                                                 <i class="fas fa-eye"></i> Publish Product
                                             </a>
                                         <?php else: ?>
-                                            <!-- Withhold Option (If Not in Cart and Not Withheld) -->
+                                            <!-- Withhold Option (If Not Withheld) -->
                                             <a href="<?php echo URLROOT; ?>/products/toggleWithhold/<?php echo $product->id; ?>"
                                                 class="btn btn-danger btn-sm"
                                                 style="background-color: #dc3545; color: #fff; border-color: #bbb;">
@@ -398,6 +399,7 @@
                                     <?php endif; ?>
                                 </div>
                             </td>
+
 
 
                         </tr>

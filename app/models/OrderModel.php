@@ -305,6 +305,7 @@ class OrderModel
             c.productId,
             c.quantity,
             p.productName,
+            p.sellingPrice,
             o.totalAmount
         FROM
             cart c
@@ -320,5 +321,21 @@ class OrderModel
         $this->db->bind(':orderId', $orderId);
 
         return $this->db->resultSet(); // Returns an array of objects or associative arrays
+    }
+
+    public function restartOrderTimer($orderId)
+    {
+        $sql = "UPDATE orders SET createdAt = NOW() WHERE id = :orderId";
+        $this->db->query($sql);
+        $this->db->bind(':orderId', $orderId);
+        $this->db->execute();
+    }
+
+    public function markTimerRestarted($orderId)
+    {
+        $sql = "UPDATE orders SET timerRestarted = 1 WHERE id = :orderId";
+        $this->db->query($sql);
+        $this->db->bind(':orderId', $orderId);
+        $this->db->execute();
     }
 }

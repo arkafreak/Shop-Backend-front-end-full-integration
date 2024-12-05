@@ -220,7 +220,7 @@
     <script>
         // Countdown timer logic
         var countdownElement = document.getElementById('timer');
-        var secondsLeft = 60; // 10 minutes countdown
+        var secondsLeft = 120; // 1 minutes countdown
 
         function updateCountdown() {
             var minutes = Math.floor(secondsLeft / 60);

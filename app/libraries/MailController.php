@@ -187,7 +187,7 @@ class MailController extends Controller
             <tr>
                 <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->productName}</td>
                 <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->quantity}</td>
-                <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$item->totalAmount}</td>
+                <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$item->sellingPrice}</td>
             </tr>";
             }
 

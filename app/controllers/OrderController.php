@@ -186,6 +186,44 @@ class OrderController extends Controller
         $this->view('order/success');
     }
 
+    public function cancel()
+    {
+        if (!Helper::isLoggedIn()) {
+            Helper::redirect(URLROOT . "/UserController/login");
+        }
+
+        $userId = $_SESSION['user_id'];
+        $orderId = $this->orderModel->getLatestOrderIdByUserId($userId);
+
+        if ($orderId) {
+            // Get the cart items for the canceled order
+            $cartItems = $this->orderModel->getOrderItemsFromCart($orderId);
+
+            // Restock the products by updating their quantities
+            foreach ($cartItems as $item) {
+                $productId = $item->productId;
+                $quantityInCart = $item->quantity; // Quantity taken by the customer
+
+                // Get the current stock for the product
+                $product = $this->productModel->getProductById($productId);
+
+                if ($product) {
+                    // Increase stock by the quantity in the cart
+                    $newStock = $product->stock + $quantityInCart; // Changed to 'stock'
+                    // Update the stock in the database
+                    $this->productModel->updateProductStock($productId, $newStock);
+                }
+            }
+
+            // Update the order status to "canceled"
+            $this->orderModel->updateOrderStatus($orderId, 'canceled');
+        }
+
+        // Redirect to the order cancellation confirmation page
+        $this->view('order/cancel');
+    }
+
+
 
     public function purchaseHistory()
     {

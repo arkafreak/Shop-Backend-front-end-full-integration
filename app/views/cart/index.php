@@ -49,14 +49,26 @@
                 <div class="cart-items mb-4">
                     <?php
                     $totalAmount = 0;
+                    $hasDiscontinued = false; // Flag to track if there's any discontinued product
                     foreach ($data['cartItems'] as $item):
                         $itemTotal = $item->quantity * $item->sellingPrice;
                         $totalAmount += $itemTotal;
+                        $isDiscontinued = $item->isWithheld == 1; // Check if the product is discontinued
+                        if ($isDiscontinued) {
+                            $hasDiscontinued = true; // Set flag if discontinued product is found
+                        }
+                        $isMaxQuantity = $item->quantity >= $item->stock; // Check if the quantity has reached the stock limit
                     ?>
-                        <div class="cart-item row align-items-center border rounded shadow-sm mb-3 p-2 bg-white">
-                            <div class="col-4 col-md-3">
-                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded"
-                                    alt="image" width="200">
+                        <div class="cart-item row align-items-center border rounded shadow-sm mb-3 p-2 bg-white position-relative">
+                            <div class="col-4 col-md-3 position-relative">
+                                <img src="<?php echo URLROOT; ?>/public/images/<?php echo htmlspecialchars($item->image_name); ?>" alt="Product" class="img-fluid rounded" width="200" <?php echo $isDiscontinued ? 'class="blurred"' : ''; ?>>
+
+                                <!-- Discontinued Overlay -->
+                                <?php if ($isDiscontinued): ?>
+                                    <div class="discontinued-overlay">
+                                        <span>Discontinued</span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="col-8 col-md-6">
                                 <h5 class="mb-2 text-truncate" style="max-width: 250px;"><?php echo htmlspecialchars($item->productName); ?></h5>
@@ -65,28 +77,21 @@
                                 <p class="mb-1">Quantity: <?php echo htmlspecialchars($item->quantity); ?></p>
                                 <p class="fw-bold mb-2">Total: ₹<?php echo number_format($itemTotal); ?></p>
 
-                                <!-- Quantity Actions -->
+                                <!-- Quantity Actions (Disabled if discontinued or max quantity reached) -->
                                 <div class="d-flex">
-                                    <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
-                                        <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
-                                        <input type="hidden" name="action" value="decrease">
-                                        <button type="submit" class="btn btn-outline-primary btn-sm">-</button>
-                                    </form>
+                                    <?php if (!$isDiscontinued): ?>
+                                        <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
+                                            <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm">-</button>
+                                        </form>
 
-                                    <!-- Check stock and disable "+" button if necessary -->
-                                    <?php
-                                    $disablePlus = ''; // By default, allow the increase button
-                                    $stockMessage = ''; // No stock message by default
-                                    if ($item->quantity >= $item->stock) {
-                                        $disablePlus = 'disabled'; // Disable the plus button if quantity is equal to stock
-                                        $stockMessage = "Only {$item->stock} in stock"; // Show stock message
-                                    }
-                                    ?>
-                                    <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
-                                        <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
-                                        <input type="hidden" name="action" value="increase">
-                                        <button type="submit" class="btn btn-outline-primary btn-sm" <?php echo $disablePlus; ?>>+</button>
-                                    </form>
+                                        <form action="<?php echo URLROOT; ?>/CartController/update" method="POST" class="me-2">
+                                            <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm" <?php echo $isMaxQuantity ? 'disabled' : ''; ?>>+</button>
+                                        </form>
+                                    <?php endif; ?>
 
                                     <form action="<?php echo URLROOT; ?>/CartController/removeItem" method="POST">
                                         <input type="hidden" name="productId" value="<?php echo $item->id; ?>">
@@ -94,9 +99,9 @@
                                     </form>
                                 </div>
 
-                                <!-- Stock Message -->
-                                <?php if (!empty($stockMessage)): ?>
-                                    <p class=" txt text-warning mt-2"><?php echo $stockMessage; ?></p>
+                                <!-- Stock Message (Only show for available stock) -->
+                                <?php if (!$isDiscontinued && $item->quantity >= $item->stock): ?>
+                                    <p class="txt text-warning mt-2"><?php echo "{$item->stock} in stock"; ?></p>
                                     <style>
                                         .txt {
                                             color: orangered !important;
@@ -108,17 +113,16 @@
                     <?php endforeach; ?>
                 </div>
 
-
                 <!-- Cart Summary -->
                 <div class="cart-summary p-3 bg-white rounded shadow-sm border">
                     <h3 class="mb-3">Order Summary</h3>
                     <p><strong>Total Amount:</strong> ₹<?php echo number_format($totalAmount); ?></p>
 
-                    <!-- Place Order Button -->
+                    <!-- Place Order Button (Disabled if any product is discontinued) -->
                     <form action="<?php echo URLROOT; ?>/OrderController/addressPayment" method="POST">
-                        <button type="submit" class="btn btn-success w-100 mb-3"
-                            <?php echo empty($data['stockIssues']) ? '' : 'disabled'; ?>>
-                            Place Order
+                        <button type="submit" class="btn btn-success w-100 mb-3" <?php echo $hasDiscontinued ? 'disabled' : ''; ?>
+                        <?php echo empty($data['stockIssues']) ? '' : 'disabled'; ?>>
+                        Place Order
                         </button>
                     </form>
 
@@ -133,6 +137,68 @@
                 </div>
             <?php endif; ?>
         </div>
+
+
+        <style>
+            /* Improved discontinued overlay */
+            .discontinued-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                /* Darker red overlay for better contrast */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+                font-size: 24px;
+                /* Slightly larger font size for better visibility */
+                font-weight: bold;
+                /* transform: rotate(-45deg); */
+                pointer-events: stroke;
+                cursor: pointer;
+                /* Prevent interference with other interactions */
+                z-index: 1;
+                /* Ensure overlay stays on top of the image */
+                opacity: 0.8;
+                /* Slight transparency for the overlay */
+            }
+
+            .discontinued-text {
+                /* transform: rotate(-45deg); */
+                /* Ensure text is readable */
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+                /* Add text shadow for better visibility */
+                font-size: 40px;
+            }
+
+            /* Blurred effect for the background */
+            .blurred {
+                position: relative;
+            }
+
+            .blurred img {
+                filter: blur(6px);
+                /* Apply blur effect to the image */
+                transition: filter 0.3s ease;
+                /* Smooth transition for blur effect */
+            }
+
+            /* Additional styling for the cart image container */
+            .cart-item img {
+                transition: transform 0.3s ease;
+                /* Smooth transition for image transformations */
+            }
+
+            .cart-item:hover img {
+                transform: scale(1.05);
+                /* Slight zoom effect on hover for better interaction */
+            }
+        </style>
+
+
     </div>
 
     <!-- Stock Warning Modal -->

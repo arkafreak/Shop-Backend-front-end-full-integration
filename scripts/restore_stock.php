@@ -12,12 +12,24 @@ $mailController = new MailController(); // Assuming you have a MailController fo
 $orders = $orderModel->getPendingOrdersOlderThan(1); // Adjusted the time limit to 1 minute
 
 foreach ($orders as $order) {
+    // Check if paymentMethod is set and timerRestarted is false
+    if (!is_null($order->paymentMethod) && !$order->timerRestarted) {
+        // Restart the timer by updating the createdAt field to the current time
+        $orderModel->restartOrderTimer($order->id);
+
+        // Mark the timer as restarted
+        $orderModel->markTimerRestarted($order->id);
+
+        echo "Timer restarted for order ID: " . $order->id . "\n";
+        continue; // Skip further processing for this order
+    }
+
     // Get the associated cart items for the order
     $cartItems = $orderModel->getOrderItemsFromCart($order->id);
 
     // Check if cart items are empty, if so, skip the current order
     if (empty($cartItems)) {
-        echo "No cart items found for order ID: " . $order->id;
+        echo "No cart items found for order ID: " . $order->id . "\n";
         continue;
     }
 
@@ -26,11 +38,9 @@ foreach ($orders as $order) {
         $product_id = $item->productId;
         // Get the quantity from the carts table for the specific product and order
         $quantityInCart = $productModel->getProductQuantityFromCart($product_id, $order->id);
-        // $quantityInCart = 5;
         // Restock the product in the inventory by increasing the stock
         $productModel->increaseStockByCartQuantity($product_id, $quantityInCart);
     }
-
 
     // Update the order status to "canceled"
     $orderModel->updateOrderStatus($order->id, 'canceled');

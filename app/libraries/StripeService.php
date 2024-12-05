@@ -33,7 +33,7 @@ class StripeService
                 'line_items' => $line_items,
                 'mode' => 'payment',
                 'success_url' => URLROOT . '/OrderController/checkout?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => URLROOT . '/checkoutController/cancel',
+                'cancel_url' => URLROOT . '/OrderController/cancel',
             ]);
 
             // die(var_dump($checkout_session));

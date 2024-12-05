@@ -190,6 +190,7 @@ class CartModel
                   p.productName,
                   p.brand,
                   p.sellingPrice,
+                  p.isWithheld,
                   c.quantity,
                   p.stock,
                   (SELECT image_name

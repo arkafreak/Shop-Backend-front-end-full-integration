@@ -316,4 +316,24 @@ class Product
             return false;
         }
     }
+
+    public function updateProductStock($productId, $newStock)
+    {
+        // Prepare the SQL query to update the stock
+        $sql = "UPDATE products SET stock = :newStock WHERE id = :productId";  // Changed 'quantity' to 'stock'
+
+        // Prepare the statement
+        $stmt = $this->db->prepare($sql);
+
+        // Bind parameters
+        $stmt->bindParam(':newStock', $newStock, PDO::PARAM_INT);
+        $stmt->bindParam(':productId', $productId, PDO::PARAM_INT);
+
+        // Execute the query and check for success
+        if ($stmt->execute()) {
+            return true; // Success
+        } else {
+            return false; // Failure
+        }
+    }
 }
