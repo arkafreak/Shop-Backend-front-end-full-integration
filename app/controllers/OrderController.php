@@ -157,34 +157,42 @@ class OrderController extends Controller
 
         $orderId = $this->orderModel->getLatestOrderIdByUserId($userId);
 
-        $totalAmount = $this->orderModel->getTotalAmountByOrderId($orderId);
+        // Check the current order status
+        $currentStatus = $this->orderModel->getOrderStatusById($orderId);
 
-        $paymentMethod = $this->orderModel->getPaymentMethodByOrderId($orderId);
+        if ($currentStatus === 'pending') {
+            $totalAmount = $this->orderModel->getTotalAmountByOrderId($orderId);
+            $paymentMethod = $this->orderModel->getPaymentMethodByOrderId($orderId);
 
-        // Update the order status to 'completed'
-        $this->orderModel->updateOrderStatus($orderId, 'completed');
+            // Update the order status to 'completed'
+            $this->orderModel->updateOrderStatus($orderId, 'completed');
 
-        // Add order items for showing in the admin dashboard
-        foreach ($cartItems as $item) {
-            $this->orderModel->addOrderItem($orderId, $item->id, $item->quantity);
+            // Add order items for showing in the admin dashboard
+            foreach ($cartItems as $item) {
+                $this->orderModel->addOrderItem($orderId, $item->id, $item->quantity);
 
-            // Update stock for the purchased products
-            // $this->productModel->reduceStock($item->id, $item->quantity);
+                // Update stock for the purchased products
+                // $this->productModel->reduceStock($item->id, $item->quantity);
+            }
+
+            // Clear the cart after successful order
+            $this->orderModel->clearCart($userId);
+
+            // Retrieve the user's email
+            $userModel = $this->model('UserModel');
+            $userEmail = $userModel->getEmailById($userId);
+            $username = $userModel->getUserNameById($userId);
+
+            // Send email notification
+            $this->mailController->sendTransactionEmail($userEmail, $username, $orderId, $totalAmount, $paymentMethod, $selectedItems);
+
+            $this->view('order/success');
+        } else {
+            // Handle cases where the order is not pending (optional)
+            $this->view('order/refund_initiated');
         }
-
-        // Clear the cart after successful order
-        $this->orderModel->clearCart($userId);
-
-        // Retrieve the user's email
-        $userModel = $this->model('UserModel');
-        $userEmail = $userModel->getEmailById($userId);
-        $username = $userModel->getUserNameById($userId);
-
-        // Send email notification
-        $this->mailController->sendTransactionEmail($userEmail, $username, $orderId, $totalAmount, $paymentMethod, $selectedItems);
-
-        $this->view('order/success');
     }
+
 
     public function cancel()
     {

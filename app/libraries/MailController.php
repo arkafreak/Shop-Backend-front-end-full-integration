@@ -183,13 +183,15 @@ class MailController extends Controller
 
             // Loop through selected items to display ordered products that were canceled
             foreach ($cartItems as $item) {
+                $totalPrice = $item->sellingPrice * $item->quantity; // Calculate total price for the item
                 $message .= "
-            <tr>
-                <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->productName}</td>
-                <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->quantity}</td>
-                <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$item->sellingPrice}</td>
-            </tr>";
+                    <tr>
+                        <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->productName}</td>
+                        <td style='padding: 8px; font-size: 14px; color:#333333;'>{$item->quantity}</td>
+                        <td style='padding: 8px; font-size: 14px; color:#333333;'>Rs. {$totalPrice}</td>
+                    </tr>";
             }
+
 
             $message .= "</tbody></table>";
 

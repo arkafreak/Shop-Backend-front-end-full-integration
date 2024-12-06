@@ -238,4 +238,23 @@ class CartModel
         $this->db->bind(':userId', $userId);
         return $this->db->execute();
     }
+
+    public function getCartItemsFinal($userId)
+    {
+        $this->db->query("
+        SELECT 
+            c.cartId as cartId,
+            p.id as productId,
+            p.productName,
+            p.sellingPrice,
+            p.stock,
+            p.isWithheld,
+            c.quantity
+        FROM cart c
+        INNER JOIN products p ON c.productId = p.id
+        WHERE c.userId = :userId
+    ");
+        $this->db->bind(':userId', $userId);
+        return $this->db->resultSet();
+    }
 }
